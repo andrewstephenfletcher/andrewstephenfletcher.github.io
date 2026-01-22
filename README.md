@@ -1,6 +1,6 @@
-# Quarto Academic Website Template
+# Andrew Stephen Fletcher Website Template
 
-Welcome! This is a simple and customizable template for building your own academic website using [Quarto](https://quarto.org/). You can easily fork, edit, and publish your site with just a few steps.
+Welcome! This is my personal website based on a template using [Quarto](https://quarto.org/). You can easily fork, edit, and publish your site with just a few steps.
 
 ## 🚀 Quick Start
 
