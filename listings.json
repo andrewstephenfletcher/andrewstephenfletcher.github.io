@@ -1,0 +1,18 @@
+[
+  {
+    "listing": "/projects.html",
+    "items": []
+  },
+  {
+    "listing": "/projects/index.html",
+    "items": [
+      "/projects/safety-viz.html"
+    ]
+  },
+  {
+    "listing": "/blog/index.html",
+    "items": [
+      "/blog/posts/test-post/index.html"
+    ]
+  }
+]

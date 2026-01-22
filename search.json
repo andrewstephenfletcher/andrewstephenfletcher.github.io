@@ -1,0 +1,121 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Andrew Stephen Fletcher",
+    "section": "",
+    "text": "I am a Data Scientist with an interest in AI Safety research. Recently I have been very interested in Representation Engineering. This website has a blog, mainly focused on explaining AI safety techniques, and a space for projects."
+  },
+  {
+    "objectID": "about.html#bio",
+    "href": "about.html#bio",
+    "title": "Andrew Stephen Fletcher",
+    "section": "",
+    "text": "I am a Data Scientist with an interest in AI Safety research. Recently I have been very interested in Representation Engineering. This website has a blog, mainly focused on explaining AI safety techniques, and a space for projects."
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "Andrew Stephen Fletcher",
+    "section": "Education",
+    "text": "Education\nUniversity of Oxford | Oxford Physics MPhys | 2019 - 2023"
+  },
+  {
+    "objectID": "about.html#experience",
+    "href": "about.html#experience",
+    "title": "Andrew Stephen Fletcher",
+    "section": "Experience",
+    "text": "Experience\nBBC Studios | Data Science Researching machine learning methods for predicting TV viewing | 2023 - present\nBlueDot | Technical AI Safety Course Course introducing ideas in technical AI safety | 2025"
+  },
+  {
+    "objectID": "blog/posts/test-post/index.html",
+    "href": "blog/posts/test-post/index.html",
+    "title": "First Post: Test Post",
+    "section": "",
+    "text": "This is a test post for my blog!"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
+    "section": "",
+    "text": "Order By\n      Default\n      \n      \n      \n        Title\n      \n      \n        Team\n      \n      \n        Funder\n      \n      \n        Description\n      \n      \n        Start\n      \n      \n        End\n      \n      \n        Funding\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n \n\n\n\nTitle\n\n\n\nTeam\n\n\n\nFunder\n\n\n\nDescription\n\n\n\nFunding\n\n\n\nStart\n\n\n\nEnd\n\n\n\n\n\n\n\n\n\n\n\nExploring \n\n\nAcademic Website\n\n\nFunder\n\n\nThe goal of this project is to investigate .\n\n\n$0\n\n\n2024\n\n\n2025\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "projects/index.html",
+    "href": "projects/index.html",
+    "title": "AI Safety Projects",
+    "section": "",
+    "text": "Interactive experiments and code visualizations.\n\n\n\n\n\n\n\n\n\n\n\n\nReward Misspecification Plot\n\n\nA visualization of agent behavior under faulty reward functions.\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/news-title/index.html",
+    "href": "posts/news-title/index.html",
+    "title": "News item",
+    "section": "",
+    "text": "About the news"
+  },
+  {
+    "objectID": "posts/news-title/index.html#summary",
+    "href": "posts/news-title/index.html#summary",
+    "title": "News item",
+    "section": "",
+    "text": "About the news"
+  },
+  {
+    "objectID": "posts/paper-title/index.html#abstract",
+    "href": "posts/paper-title/index.html#abstract",
+    "title": "Can quantum-mechanical description of physical reality be considered complete?",
+    "section": "Abstract",
+    "text": "Abstract\nIn a complete theory there is an element corresponding to each element of reality. A sufficient condition for the reality of a physical quantity is the possibility of predicting it with certainty, without disturbing the system. In quantum mechanics in the case of two physical quantities described by non-commuting operators, the knowledge of one precludes the knowledge of the other. Then either (1) the description of reality given by the wave function in quantum mechanics is not complete or (2) these two quantities cannot have simultaneous reality. Consideration of the problem of making predictions concerning a system on the basis of measurements made on another system that had previously interacted with it leads to the result that if (1) is false then (2) is also false. One is thus led to conclude that the description of reality as given by a wave function is not complete."
+  },
+  {
+    "objectID": "posts/paper-title/index.html#links",
+    "href": "posts/paper-title/index.html#links",
+    "title": "Can quantum-mechanical description of physical reality be considered complete?",
+    "section": "Links",
+    "text": "Links\nPublished paper"
+  },
+  {
+    "objectID": "projects/safety-viz.html",
+    "href": "projects/safety-viz.html",
+    "title": "Reward Misspecification Plot",
+    "section": "",
+    "text": "Here is a quick Python test to verify my interactive elements:\nimport matplotlib.pyplot as plt import numpy as np\nx = np.linspace(0, 10, 100) y = np.exp(x / 3) # Exponential ‘risk’ plot\nplt.plot(x, y, color=‘red’) plt.title(“Agent Risk Profile”) plt.show()"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Andrew Stephen Fletcher",
+    "section": "",
+    "text": "I am a Data Scientist with an interest in AI Safety research. Recently I have been very interested in Representation Engineering. This website has a blog, mainly focused on explaining AI safety techniques, and a space for projects."
+  },
+  {
+    "objectID": "index.html#bio",
+    "href": "index.html#bio",
+    "title": "Andrew Stephen Fletcher",
+    "section": "",
+    "text": "I am a Data Scientist with an interest in AI Safety research. Recently I have been very interested in Representation Engineering. This website has a blog, mainly focused on explaining AI safety techniques, and a space for projects."
+  },
+  {
+    "objectID": "index.html#education",
+    "href": "index.html#education",
+    "title": "Andrew Stephen Fletcher",
+    "section": "Education",
+    "text": "Education\nUniversity of Oxford | Oxford\nPhysics MPhys | 2019 - 2023\nUniversity of Exeter | Exeter\nData Science MSc | 2023 - present"
+  },
+  {
+    "objectID": "index.html#experience",
+    "href": "index.html#experience",
+    "title": "Andrew Stephen Fletcher",
+    "section": "Experience",
+    "text": "Experience\nBBC Studios | Data Science\nResearching machine learning methods for predicting TV viewing | 2023 - present\nBlueDot | Technical AI Safety Course\nCourse introducing ideas in technical AI safety | 2025"
+  },
+  {
+    "objectID": "blog/index.html",
+    "href": "blog/index.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Notes and deep-dives into AI alignment research.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFirst Post: Test Post\n\n\n\nresearch\n\nintro\n\n\n\n\n\n\n\n\n\nJan 21, 2026\n\n\n\n\n\nNo matching items"
+  }
+]
