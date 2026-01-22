@@ -1,26 +1,18 @@
 [
   {
-    "listing": "/posts.html",
-    "items": [
-      "/posts/event-title/index.html",
-      "/posts/news-title/index.html",
-      "/posts/paper-title/index.html"
-    ]
-  },
-  {
     "listing": "/projects.html",
     "items": []
   },
   {
-    "listing": "/index.html",
+    "listing": "/projects/index.html",
     "items": [
-      "/posts/event-title/index.html",
-      "/posts/news-title/index.html",
-      "/posts/paper-title/index.html"
+      "/projects/safety-viz.html"
     ]
   },
   {
-    "listing": "/people.html",
-    "items": []
+    "listing": "/blog/index.html",
+    "items": [
+      "/blog/posts/test-post/index.html"
+    ]
   }
 ]

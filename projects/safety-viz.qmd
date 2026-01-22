@@ -1,0 +1,17 @@
+---
+title: "Reward Misspecification Plot"
+description: "A visualization of agent behavior under faulty reward functions."
+---
+
+Here is a quick Python test to verify my interactive elements:
+
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 10, 100)
+y = np.exp(x / 3) # Exponential 'risk' plot
+
+plt.plot(x, y, color='red')
+plt.title("Agent Risk Profile")
+plt.show()

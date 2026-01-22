@@ -1,1 +1,28 @@
+# --- Quarto ---
+# Temporary folder used by Quarto for rendering artifacts
 /.quarto/
+**/*.quarto_ipynb
+# The directory where Quarto builds the website (if you are publishing manually)
+/_site/
+/docs/
+
+# --- Python & uv ---
+# The virtual environment folder created by uv
+.venv/
+# Python bytecode (speeds up execution but doesn't belong in Git)
+__pycache__/
+*.py[cod]
+*$py.class
+# uv environment and versioning
+.python-version
+
+# --- Environment Secrets ---
+# Crucial: Ignore your local secrets file
+.env
+# Ignore Quarto-specific local environment overrides
+_environment.local
+_quarto.yml.local
+
+# --- Operating System ---
+.DS_Store
+Thumbs.db
