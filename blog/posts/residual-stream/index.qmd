@@ -1,0 +1,222 @@
+---
+title: "The Residual Stream"
+date: "2026-01-28"
+categories: [mechanistic interpretability, residual stream, latent space monitoring]
+draft: False
+bibliography: ../../../references.bib
+---
+
+This post discusses the residual stream in transformer models and builds
+towards using it for two examples of mechanistic
+interpretability: Logit Lens [@Logit-Lens] and Linear Probes [@Linear-Probes].
+
+## Transformers
+
+Much of the description of a transformer here comes straight from the excellent "A Mathematical
+Framework for Transformer Circuits" [@Mathematical-Framework-for-Transformer-Circuits].
+
+The transformer is made of a few crucial components:
+
+* Token embedding, $W_{E}$
+* Residual Stream, $x_{i}$
+* Attention layer, $Attn(x_{i}) = \sum_{h \in H} h(x_{i})$
+* MLP Layer, $MLP(x_{i})$
+* Unembedding, $W_{U}$
+
+I will give a high level overview of what some of these elements do by considering the
+input sequence,
+
+::: {style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;"}
+"The capital of the country containing Manchester^[Getting a sensible answer from
+small LLMs is hard, GPT-2 prompted with “The capital of the country containing
+Lyon is" returned “the" with 30% confidence and “France" with only 4% confidence.] is"
+:::
+
+We will follow the final token "is" as this is the token from which the model will
+predict the next token.
+
+The first step is to use the Token embedding,
+$W_{E} \in \mathbb{R}^{d_{model} \times d_{vocab}}$, which acts as a look-up table
+from the token "is", which we represent initially by the Token index
+$t \in \mathbb{R}^{d_{vocab}}$, to the $d_{model}$ vector that represents it,
+
+$$
+x_{0} = W_{E} t
+$$ {#eq-embedding}
+
+This is the source of the residual stream, each process in the model adds *something*
+to this initial vector $x_{0}$^[There has been some progress towards not using the
+simple additive residual stream. One such example are Hyper-Connections
+[@Hyper-Connections], which allow the strength of connections between layers to be
+learnt during training. With the residual stream a crucial tool for safety researchers I
+think it would be a major set back if connection variants such as this became the
+norm.]. The vector $x_{0}$ starts as an isolated embedding of the token "is" but
+finishes as a representation capable of predicting the next token in the sequence.
+
+![High level diagram of the residual stream](images/residual-stream.svg){width="100%"}
+
+Most commonly it seems a *layer*^[[@Mathematical-Framework-for-Transformer-Circuits]
+also refers to this as a "residual block".] of a transformer refers to the combination
+of an Attention layer and an MLP layer but they add to the residual stream sequentially,
+
+$$
+x_{n+1} = x_{n} + Attn(x_{n}) + MLP(x_{n} + Attn(x_{n}))
+$$ {#eq-layer}
+
+Attention heads move information from the residual streams of other tokens in the
+sequence. For example in our example if we are going to answer the question,
+
+::: {style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;"}
+"The capital of the country containing Manchester is"
+:::
+
+our final representation $x_{-1}$ is going to need to capture the multi-hop reasoning that the
+`country` containing `Manchester` is the United Kingdom and hence the `capital` is London we
+need to move information from these other tokens.
+
+It must also know these geographical facts, research suggests that this is captured
+*somewhere* within the MLP layers [@Fact-Finding].
+
+## Why residuals?
+
+There are a few reasons that this additive approach is favoured but their inclusion is
+likely a legacy of the Residual Neural Network (ResNet) [@ResNet]. This paper suggested
+a residual stream formulation,
+
+$$
+x + f(x)
+$$ {#eq-ResNet-formulation}
+
+which has since also become known as a skip connection. The layers of
+the network return a "residual mapping" $f(x)$ which is added to the main input. From
+their paper the primary motivation was to combat *the degradation problem*, where deeper
+networks have higher training and test error. This should be slightly surprising as we
+might expect a model with 20 layers can be replicated within a model of 50 layers.
+
+It turns out that for networks without a residual stream the correlation between
+gradients decays exponentially [@shattered-gradients], that is to say at
+a point $x$ the gradient $\nabla f(x)$ might be almost random compared to a near by point
+$x + \delta$ with gradient $\nabla f(x + \delta)$. If the gradients are almost random
+gradient descent is too, we set off down the slope only to immediately find it increase
+again. In contrast, with skip connections the correlation between gradients decays
+sub-linearly.
+
+A subtly different additional benefit to using a residual stream is that we also solve
+*the vanishing gradient problem*, where by in a deep network backpropagation will
+involve many applications of the chain rule such that if any of the gradients are small
+the total update to the weights will vanish.
+
+Following this 3Blue1Brown explainer [@3b1b-backpropagation] we consider a very simple
+network with single neuron layers, connected in sequence. Let's say every layer consists
+of,
+
+$$
+f(x_{i}) = \sigma(W x_{i}  + b)
+$$ {#eq-simple-network}
+
+The *sigmoid function*^[ReLU and GELU activation functions are designed to also combat
+the vanishing gradient problem.], $\sigma$, is defined as,
+
+$$
+\sigma(z) = \frac{e^z}{1+e^z}
+$$ {#eq-sigmoid}
+
+Its derivative, $\sigma'(z) = \sigma(z)(1 - \sigma(z))$, is bounded within the interval
+$(0, 0.25]$. Hence, when we calculate the gradient of the loss, $\nabla \mathcal{L}$, in
+backpropagation this term will reduce the resulting value by at least a factor of
+4 each layer. As we update the weights according to $-\eta \nabla \mathcal{L}$ when
+the gradient vanishes we stop learning.
+
+With a residual stream there will always be a non-zero gradient,
+
+$$
+x_{i+1} = x_{i} + f(x_{i})
+$$ {#eq-residual}
+
+$$
+\frac{\partial(x_{i+1})}{\partial x_{i}} = 1 + f'(x_{i})
+$$ {#eq-residual-gradient}
+
+The constant term $1$ means even with repeated applications of the chain rule
+it is always possible to trace through the network to get a non-zero update to
+earlier layers.
+
+
+## The Residual Stream in Mechanistic Interpretability
+
+With this consistent $d_{model}$ dimension vector flowing through the model we have an
+obvious place to inspect the model's *thoughts*. As each layer refines the
+representation of the "is" token in preparation for predicting the next we can explore
+two ways to interpret this process:
+
+- Logit Lens [@Logit-Lens]
+- Linear Probes [@Linear-Probes]
+
+In the rest of this post I have some experiments that use these techniques to
+illustrate their value.
+
+### Logit Lens
+
+The idea beyhind Logit Lens is simple, after the final layer, $x_{-1}$, of the transformer we apply
+an unembedding to get logits,
+
+$$
+T(t) = W_{U} x_{-1}
+$$ {#eq-unembed}
+
+which allow us to predict words. For our input sequence GPT-2 returned:
+
+- `London` with 13% confidence
+- `Birmingham` with 8% confidence
+- `not` with 6% confidence
+- ...
+
+We can however apply the unembedding to intermediate vectors in the residual stream,
+getting a crude understanding of what the model is thinking of at that point. This
+allows us, in a very simple way, to see the thoughts of the model progress through
+the layers.
+
+::: {.callout-note collapse="true"}
+## Tuned Lens
+
+It turns out that logit lens is not very reliable, when we apply the unembedding we find
+something uninformative such as the input token repeated.
+
+This problem is partially solved by the Tuned Lens [@belrose2023eliciting].
+
+By accounting for a non-zero bias term and allowing a change of basis we get results
+that better match how Logit Lens performed on GPT-2.
+:::
+
+
+### Linear Probes
+
+Linear probes approach the interpretability problem in a different way. Imagine we have
+two classes of inputs, the linear probe is a classifier trained on the residual stream
+vectors that learns to distinguish the classes. Examples might include:
+
+- Proper punctuation vs. ALL CAPS
+- Natural language vs. HTML
+- Harmless text vs. Harmful text
+
+The first case we might imagine is quite simple to learn: there is a simple
+pattern-matching problem for the model to spot between `"Hello, can I help you?"` and
+`"HELLO, CAN I HELP YOU?"`. Likewise, the second is hopefully quite easy to discern, but
+perhaps requires some more thinking: `"The main header of the page says Hello."` looks
+very different to `"<h1 class='main-header'> Hello </h1>"`, but it requires more
+knowledge to consistently separate the two.
+
+Finally, examples of harmless and harmful text might be really tricky to separate,
+requiring genuine semantic understanding. For example, `"There is a bug in your code,
+so you should **refactor the function.**"` is quite harmless whereas `"There is a bug in
+your code, so you should **disable the firewall.**"` could be catastrophic.
+
+![High level diagram of Linear Probes](images/linear-probes.svg){width="100%"}
+
+## References
+
+
+
+
+
+

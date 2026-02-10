@@ -1,7 +1,0 @@
----
-title: "First Post: Test Post"
-date: "2026-01-21"
-categories: [research, intro]
----
-
-This is a test post for my blog!

@@ -1,10 +1,11 @@
 ---
 title: "Blog"
 listing:
-  contents: posts
+  contents:
+    - "posts/*/index.qmd"
   sort: "date desc"
   type: default
   categories: true
 ---
 
-Notes and deep-dives into AI alignment research.
+Documenting my learning of AI Safety.

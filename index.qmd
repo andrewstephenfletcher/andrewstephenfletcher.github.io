@@ -17,20 +17,22 @@ about:
 
 ## Bio
 
-I am a Data Scientist with an interest in AI Safety research. Recently I have been very interested in Representation Engineering. This website has a blog, mainly focused on explaining AI safety techniques, and a space for projects.
+I am a Data Scientist with an interest in AI Safety research. I am keen to learn more
+about many areas but have started diving into Latent Space Monitoring. This website has a
+blog, mainly focused on explaining AI safety techniques as I learn them.
 
 ## Education
 
-**University of Oxford** | Oxford \
-Physics MPhys | 2019 - 2023
+**University of Exeter** | Data Science MSc \
+Deep learning and PyTorch | 2023 - *present*
 
-**University of Exeter** | Exeter \
-Data Science MSc | 2023 - *present*
+**University of Oxford** | Physics MPhys \
+Focus on Astrophysics | 2019 - 2023
 
 ## Experience
 
 **BBC Studios** | Data Science \
-Researching machine learning methods for predicting TV viewing | 2023 - *present*
+ML research predicting TV viewing | 2023 - *present*
 
 **BlueDot** | Technical AI Safety Course \
 Course introducing ideas in technical AI safety | 2025
