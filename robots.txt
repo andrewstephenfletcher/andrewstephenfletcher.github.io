@@ -1,1 +1,1 @@
-Sitemap: https://andrewstephenfletcher.github.io/sitemap.xml
+Sitemap: https://andrewstephenfletcher.com/sitemap.xml

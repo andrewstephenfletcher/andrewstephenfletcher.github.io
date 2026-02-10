@@ -1,43 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://andrewstephenfletcher.github.io/about.html</loc>
-    <lastmod>2026-01-21T17:55:18.111Z</lastmod>
+    <loc>https://andrewstephenfletcher.com/notebooks/hf.html</loc>
+    <lastmod>2026-01-30T14:12:39.518Z</lastmod>
   </url>
   <url>
-    <loc>https://andrewstephenfletcher.github.io/blog/posts/test-post/index.html</loc>
-    <lastmod>2026-01-22T09:17:16.763Z</lastmod>
+    <loc>https://andrewstephenfletcher.com/blog/index.html</loc>
+    <lastmod>2026-02-10T14:11:58.285Z</lastmod>
   </url>
   <url>
-    <loc>https://andrewstephenfletcher.github.io/projects.html</loc>
+    <loc>https://andrewstephenfletcher.com/blog/posts/residual-stream/residual_stream_animation.html</loc>
+    <lastmod>2026-02-10T14:11:58.296Z</lastmod>
+  </url>
+  <url>
+    <loc>https://andrewstephenfletcher.com/docs/blog/posts/residual-stream/residual_stream_animation.out.html</loc>
+    <lastmod>2026-01-30T09:29:52.363Z</lastmod>
+  </url>
+  <url>
+    <loc>https://andrewstephenfletcher.com/projects.html</loc>
     <lastmod>2026-01-22T11:23:12.661Z</lastmod>
   </url>
   <url>
-    <loc>https://andrewstephenfletcher.github.io/projects/index.html</loc>
+    <loc>https://andrewstephenfletcher.com/projects/index.html</loc>
     <lastmod>2026-01-21T17:23:30.509Z</lastmod>
   </url>
   <url>
-    <loc>https://andrewstephenfletcher.github.io/posts/news-title/index.html</loc>
+    <loc>https://andrewstephenfletcher.com/posts/news-title/index.html</loc>
     <lastmod>2026-01-22T11:23:12.658Z</lastmod>
   </url>
   <url>
-    <loc>https://andrewstephenfletcher.github.io/posts/paper-title/index.html</loc>
+    <loc>https://andrewstephenfletcher.com/posts/paper-title/index.html</loc>
     <lastmod>2026-01-22T11:23:12.661Z</lastmod>
   </url>
   <url>
-    <loc>https://andrewstephenfletcher.github.io/posts/event-title/index.html</loc>
+    <loc>https://andrewstephenfletcher.com/posts/event-title/index.html</loc>
     <lastmod>2026-01-22T11:23:12.658Z</lastmod>
   </url>
   <url>
-    <loc>https://andrewstephenfletcher.github.io/projects/safety-viz.html</loc>
+    <loc>https://andrewstephenfletcher.com/projects/safety-viz.html</loc>
     <lastmod>2026-01-21T17:26:57.415Z</lastmod>
   </url>
   <url>
-    <loc>https://andrewstephenfletcher.github.io/index.html</loc>
-    <lastmod>2026-01-22T11:23:12.789Z</lastmod>
+    <loc>https://andrewstephenfletcher.com/docs/blog/posts/residual-stream/residual_stream_animation.html</loc>
+    <lastmod>2026-01-30T09:27:17.631Z</lastmod>
   </url>
   <url>
-    <loc>https://andrewstephenfletcher.github.io/blog/index.html</loc>
-    <lastmod>2026-01-22T09:16:46.047Z</lastmod>
+    <loc>https://andrewstephenfletcher.com/index.html</loc>
+    <lastmod>2026-02-10T14:11:58.302Z</lastmod>
+  </url>
+  <url>
+    <loc>https://andrewstephenfletcher.com/blog/posts/residual-stream/index.html</loc>
+    <lastmod>2026-02-10T14:11:58.287Z</lastmod>
+  </url>
+  <url>
+    <loc>https://andrewstephenfletcher.com/notebooks/Branching model tutorial.html</loc>
+    <lastmod>2026-01-29T14:27:35.111Z</lastmod>
   </url>
 </urlset>
