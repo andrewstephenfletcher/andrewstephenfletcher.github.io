@@ -9,6 +9,7 @@
 # --- Python & uv ---
 # The virtual environment folder created by uv
 .venv/
+
 # Python bytecode (speeds up execution but doesn't belong in Git)
 __pycache__/
 *.py[cod]
@@ -26,3 +27,8 @@ _quarto.yml.local
 # --- Operating System ---
 .DS_Store
 Thumbs.db
+
+# -- Development --
+# For the time being we will hide the notebooks used for research
+notebooks/**
+

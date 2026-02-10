@@ -1,16 +1,23 @@
 project:
   type: website
-  output-dir: docs
+  resources:
+    - CNAME
+
+output-dir: docs
+
+render:
+  - "*.qmd"
+  - "!notebooks/"
 
 jupyter: python3
 
 website:
-  title: "Andrew Stephen Fletcher"
   description: "AI Safety Learning Log & Projects"
-
+  site-url: https://andrewstephenfletcher.com
   navbar:
-    background: primary
+    background: light
     search: true
+    title: "Andrew Stephen Fletcher"
     left:
       - text: "Blog"
         href: blog/index.qmd
@@ -20,15 +27,22 @@ website:
       - icon: github
         href: https://github.com/andrewstephenfletcher
         target: _blank
-
   page-footer:
     left: "© <script>document.write(new Date().getFullYear())</script> Andrew Stephen Fletcher"
     center: "Built with [Quarto](https://quarto.org)"
 
 format:
   html:
-    theme: flatly
-    css: styles.css
+    theme: [cosmo, styles.css]
     toc: true
-    code-fold: true
+    toc-location: left
     code-copy: true
+    fontsize: 1.0rem
+    callout-appearance: simple
+    callout-icon: false
+    reference-location: margin
+    grid:
+      content-mode: slim
+      body-width: 800px # Narrower body = denser feel
+      margin-width: 250px
+      gutter-width: 1.5rem
