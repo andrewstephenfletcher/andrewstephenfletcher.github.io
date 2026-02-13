@@ -1,6 +1,6 @@
 ---
 title: "The Residual Stream"
-date: "2026-01-28"
+date: "2026-02-10"
 categories: [mechanistic interpretability, residual stream, latent space monitoring]
 draft: False
 bibliography: ../../../references.bib
@@ -176,13 +176,15 @@ getting a crude understanding of what the model is thinking of at that point. Th
 allows us, in a very simple way, to see the thoughts of the model progress through
 the layers.
 
+![High level diagram of Logit Lens](images/logit-lens.svg){width="100%"}
+
 ::: {.callout-note collapse="true"}
 ## Tuned Lens
 
 It turns out that logit lens is not very reliable, when we apply the unembedding we find
 something uninformative such as the input token repeated.
 
-This problem is partially solved by the Tuned Lens [@belrose2023eliciting].
+This problem is partially solved by the Tuned Lens [@Tuned-Lens].
 
 By accounting for a non-zero bias term and allowing a change of basis we get results
 that better match how Logit Lens performed on GPT-2.
