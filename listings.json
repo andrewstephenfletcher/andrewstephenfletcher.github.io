@@ -6,13 +6,13 @@
     ]
   },
   {
-    "listing": "/projects.html",
-    "items": []
-  },
-  {
     "listing": "/projects/index.html",
     "items": [
       "/projects/safety-viz.html"
     ]
+  },
+  {
+    "listing": "/projects.html",
+    "items": []
   }
 ]

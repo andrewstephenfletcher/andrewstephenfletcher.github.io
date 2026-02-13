@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-01-28">
+<meta name="dcterms.date" content="2026-02-10">
 
 <title>The Residual Stream</title>
 <style>
@@ -205,7 +205,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">January 28, 2026</p>
+      <p class="date">February 10, 2026</p>
     </div>
   </div>
   
@@ -305,6 +305,12 @@ T(t) = W_{U} x_{-1}
 <li>…</li>
 </ul>
 <p>We can however apply the unembedding to intermediate vectors in the residual stream, getting a crude understanding of what the model is thinking of at that point. This allows us, in a very simple way, to see the thoughts of the model progress through the layers.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/logit-lens.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>High level diagram of Logit Lens</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -318,7 +324,7 @@ T(t) = W_{U} x_{-1}
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>It turns out that logit lens is not very reliable, when we apply the unembedding we find something uninformative such as the input token repeated.</p>
-<p>This problem is partially solved by the Tuned Lens <span class="citation" data-cites="belrose2023eliciting">(<a href="#ref-belrose2023eliciting" role="doc-biblioref"><strong>belrose2023eliciting?</strong></a>)</span>.</p>
+<p>This problem is partially solved by the Tuned Lens <span class="citation" data-cites="Tuned-Lens">(<a href="#ref-Tuned-Lens" role="doc-biblioref">Belrose et al. 2023</a>)</span>.</p>
 <p>By accounting for a non-zero bias term and allowing a change of basis we get results that better match how Logit Lens performed on GPT-2.</p>
 </div>
 </div>
@@ -356,6 +362,9 @@ Alain, Guillaume, and Yoshua Bengio. 2018. <span>“Understanding Intermediate L
 </div>
 <div id="ref-shattered-gradients" class="csl-entry" role="listitem">
 Balduzzi, David, Marcus Frean, Lennox Leary, JP Lewis, Kurt Wan-Duo Ma, and Brian McWilliams. 2018. <span>“The Shattered Gradients Problem: If Resnets Are the Answer, Then What Is the Question?”</span> <a href="https://arxiv.org/abs/1702.08591">https://arxiv.org/abs/1702.08591</a>.
+</div>
+<div id="ref-Tuned-Lens" class="csl-entry" role="listitem">
+Belrose, Nora, Igor Ostrovsky, Lev McKinney, Zach Furman, Logan Smith, Danny Halawi, Stella Biderman, and Jacob Steinhardt. 2023. <span>“Eliciting Latent Predictions from Transformers with the Tuned Lens.”</span> <a href="https://doi.org/10.48550/arXiv.2303.08112">https://doi.org/10.48550/arXiv.2303.08112</a>.
 </div>
 <div id="ref-Mathematical-Framework-for-Transformer-Circuits" class="csl-entry" role="listitem">
 Elhage, Nelson, Neel Nanda, Catherine Olsson, Tom Henighan, Nicholas Joseph, Ben Mann, Amanda Askell, et al. 2021. <span>“A Mathematical Framework for Transformer Circuits.”</span> <em>Transformer Circuits Thread</em>. <a href="https://transformer-circuits.pub/2021/framework/index.html">https://transformer-circuits.pub/2021/framework/index.html</a>.
