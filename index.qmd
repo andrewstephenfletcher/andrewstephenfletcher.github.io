@@ -18,7 +18,7 @@ about:
 ## Bio
 
 I am a Data Scientist with an interest in AI Safety research. I am keen to learn more
-about many areas but have started diving into Latent Space Monitoring. This website has a
+about many areas but have started diving into latent-space monitoring. This website has a
 blog, mainly focused on explaining AI safety techniques as I learn them.
 
 ## Education

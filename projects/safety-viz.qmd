@@ -1,17 +1,26 @@
 ---
-title: "Reward Misspecification Plot"
-description: "A visualization of agent behavior under faulty reward functions."
+title: "How well can LLMs hide their thoughts from Probes?"
+description: "Linear probes are a promising way to interpret the working of LLMs. They have importantly been shown to allow fast and affordable monitoring of harmful behaviours and as a result are currently a popular technique among safety researchers.
+
+We want to build on this work and answer:
+
+What types of models do we get from Adversarial Obfuscation Training, and are some defences better for dealing with this?
+"
 ---
 
-Here is a quick Python test to verify my interactive elements:
+Linear probes are a promising way to interpret the working of LLMs. They have importantly been shown to allow fast and affordable monitoring of harmful behaviours and as a result are currently a popular technique among safety researchers.
 
-```{python}
-import matplotlib.pyplot as plt
-import numpy as np
+However, recent papers suggest that this might be fragile:
+- Obfuscated Activations Bypass LLM Latent-Space Defenses, showed that injecting obfuscating tokens evades the probes.
+- Neural Chameleons, showed that with a suitable loss term during training models can be triggered to evades the probes.
+- RL-OBFUSCATION, showed that the models can learn to evade probes via reinforcement learning.
 
-x = np.linspace(0, 10, 100)
-y = np.exp(x / 3) # Exponential 'risk' plot
+We want to build on this work and answer:
 
-plt.plot(x, y, color='red')
-plt.title("Agent Risk Profile")
-plt.show()
+What types of models do we get from Adversarial Obfuscation Training, and are some defences better for dealing with this?
+
+Some research directions we might take:
+
+- Do we get qualitatively different policies from RL Obfuscation [1] when training on other datasets (eg: Dolus Chat [2])
+- Interpret Obfuscated Activations [4] and neural chameleons [3]
+- Try defences on backdoored models from RL Obfuscation

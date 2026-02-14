@@ -1,7 +1,7 @@
 ---
 title: "The Residual Stream"
 date: "2026-02-10"
-categories: [mechanistic interpretability, residual stream, latent space monitoring]
+categories: [mechanistic interpretability, residual stream, linear probes]
 draft: False
 bibliography: ../../../references.bib
 ---
@@ -27,17 +27,15 @@ I will give a high level overview of what some of these elements do by consideri
 input sequence,
 
 ::: {style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;"}
-"The capital of the country containing Manchester^[Getting a sensible answer from
-small LLMs is hard, GPT-2 prompted with “The capital of the country containing
-Lyon is" returned “the" with 30% confidence and “France" with only 4% confidence.] is"
+"The capital of the country containing Manchester is"
 :::
 
-We will follow the final token "is" as this is the token from which the model will
-predict the next token.
+We consider the final token "is" as this is the token from which the model will
+predict the first unseen token, which we hope will be the correct answer London.
 
 The first step is to use the Token embedding,
 $W_{E} \in \mathbb{R}^{d_{model} \times d_{vocab}}$, which acts as a look-up table
-from the token "is", which we represent initially by the Token index
+from the token "is", which we represent initially by the token index
 $t \in \mathbb{R}^{d_{vocab}}$, to the $d_{model}$ vector that represents it,
 
 $$
@@ -48,14 +46,13 @@ This is the source of the residual stream, each process in the model adds *somet
 to this initial vector $x_{0}$^[There has been some progress towards not using the
 simple additive residual stream. One such example are Hyper-Connections
 [@Hyper-Connections], which allow the strength of connections between layers to be
-learnt during training. With the residual stream a crucial tool for safety researchers I
-think it would be a major set back if connection variants such as this became the
-norm.]. The vector $x_{0}$ starts as an isolated embedding of the token "is" but
-finishes as a representation capable of predicting the next token in the sequence.
+learnt during training.]. The vector $x_{0}$ starts as an isolated embedding of the
+token "is" but finishes as a representation capable of predicting the next token in the
+sequence.
 
 ![High level diagram of the residual stream](images/residual-stream.svg){width="100%"}
 
-Most commonly it seems a *layer*^[[@Mathematical-Framework-for-Transformer-Circuits]
+Most commonly a *layer*^[[@Mathematical-Framework-for-Transformer-Circuits]
 also refers to this as a "residual block".] of a transformer refers to the combination
 of an Attention layer and an MLP layer but they add to the residual stream sequentially,
 
@@ -71,11 +68,11 @@ sequence. For example in our example if we are going to answer the question,
 :::
 
 our final representation $x_{-1}$ is going to need to capture the multi-hop reasoning that the
-`country` containing `Manchester` is the United Kingdom and hence the `capital` is London we
-need to move information from these other tokens.
+`country` containing `Manchester` is the United Kingdom and hence the `capital` is
+London. Clearly to answer this we need to move information from these other tokens.
 
-It must also know these geographical facts, research suggests that this is captured
-*somewhere* within the MLP layers [@Fact-Finding].
+The model must also know these geographical facts, research suggests that this is
+captured *somewhere* within the MLP layers [@Fact-Finding].
 
 ## Why residuals?
 
@@ -90,8 +87,10 @@ $$ {#eq-ResNet-formulation}
 which has since also become known as a skip connection. The layers of
 the network return a "residual mapping" $f(x)$ which is added to the main input. From
 their paper the primary motivation was to combat *the degradation problem*, where deeper
-networks have higher training and test error. This should be slightly surprising as we
-might expect a model with 20 layers can be replicated within a model of 50 layers.
+networks have higher training and test error. This should be slightly surprising, we
+might expect a model with 20 layers can be replicated within a model of 50 layers - if
+we set the first 20 layers to match the smaller model and the remaining 30 layers to be
+the identity.
 
 It turns out that for networks without a residual stream the correlation between
 gradients decays exponentially [@shattered-gradients], that is to say at
@@ -101,8 +100,8 @@ gradient descent is too, we set off down the slope only to immediately find it i
 again. In contrast, with skip connections the correlation between gradients decays
 sub-linearly.
 
-A subtly different additional benefit to using a residual stream is that we also solve
-*the vanishing gradient problem*, where by in a deep network backpropagation will
+A subtly different additional benefit to using a residual stream is that we also address
+*the vanishing gradient problem*, which is where backpropagation in a deep network will
 involve many applications of the chain rule such that if any of the gradients are small
 the total update to the weights will vanish.
 
@@ -114,7 +113,7 @@ $$
 f(x_{i}) = \sigma(W x_{i}  + b)
 $$ {#eq-simple-network}
 
-The *sigmoid function*^[ReLU and GELU activation functions are designed to also combat
+The *sigmoid function*^[ReLU and GELU activation functions are designed to also address
 the vanishing gradient problem.], $\sigma$, is defined as,
 
 $$
@@ -138,8 +137,8 @@ $$
 $$ {#eq-residual-gradient}
 
 The constant term $1$ means even with repeated applications of the chain rule
-it is always possible to trace through the network to get a non-zero update to
-earlier layers.
+it is always possible to trace through the network and update the weights of earlier
+layers.
 
 
 ## The Residual Stream in Mechanistic Interpretability
@@ -164,56 +163,152 @@ $$
 T(t) = W_{U} x_{-1}
 $$ {#eq-unembed}
 
-which allow us to predict words. For our input sequence GPT-2 returned:
+which allow us to predict words. For our input sequence Phi-3 returned:
 
-- `London` with 13% confidence
-- `Birmingham` with 8% confidence
-- `not` with 6% confidence
+- `London` with 76% probability
+- `West` with 5% probability
+- `B` with 4% probability
 - ...
 
 We can however apply the unembedding to intermediate vectors in the residual stream,
-getting a crude understanding of what the model is thinking of at that point. This
-allows us, in a very simple way, to see the thoughts of the model progress through
-the layers.
+getting a crude understanding of what the model is thinking at that point. This
+allows us to see the most probably token next token for each token in the sequence and
+for each layer in the model.
 
 ![High level diagram of Logit Lens](images/logit-lens.svg){width="100%"}
 
 ::: {.callout-note collapse="true"}
 ## Tuned Lens
 
-It turns out that logit lens is not very reliable, when we apply the unembedding we find
-something uninformative such as the input token repeated.
+It turns out that Logit Lens is not very reliable. Each layer is free to represent
+features differently so long as the final layer corresponds to the unembedding. It works
+for some models but not all.
 
-This problem is partially solved by the Tuned Lens [@Tuned-Lens].
-
-By accounting for a non-zero bias term and allowing a change of basis we get results
-that better match how Logit Lens performed on GPT-2.
+This problem is partially solved by the Tuned Lens [@Tuned-Lens]. By accounting for a
+non-zero bias term and allowing a change of basis we get results that better match how
+Logit Lens orginally performed on GPT-2.
 :::
 
+A great example of using a Logit Lens is the paper "Do Llamas Work in English? On the
+Latent Language of Multilingual Transformers" [@do-llamas-work-in-english]. Which gave
+models a translation task and applied Logit Lens to see if the model thought in the
+prompt language or English.
+
+I have replicated this experiment using Phi-3 and a simple prompt where we expect the
+model to spot the pattern in French and return the correct flavour associated with the
+food,
+
+::: {style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;"}
+"Citron: Acide\
+Sucre: Sucré\
+Piment: Épicé\
+Miel:"
+:::
+
+For this prompt we would expect a response *Doux* telling us that *Miel* (Honey) has a
+*Sweet/Mild* flavour. We run inference with the prompt and save the hidden states. Then
+we apply $W_{U}$ and a softmax^[The softmax function is $\sigma(z_{i}) = \frac{e^{z_{i}}}{\sum e^{z_{j}}}$] and find the token with the highest probability for
+each layer.
+
+
+![Evolution of tokens seen with Logit Lens](images/logit_lens_viz.svg){width="100%"}
+
+In the plot above we can see a successful replication of [@do-llamas-work-in-english].
+With rows representing the layers of the model and columns the tokens in the sequence.
+We see from layer 22 to 27 the model is thinking `sweet` in English and only in the last
+4 layers does it pivot and prepare to output the correct French word `Doux`!
 
 ### Linear Probes
 
 Linear probes approach the interpretability problem in a different way. Imagine we have
 two classes of inputs, the linear probe is a classifier trained on the residual stream
-vectors that learns to distinguish the classes. Examples might include:
+vectors that learns to distinguish these classes. Examples might include:
 
 - Proper punctuation vs. ALL CAPS
-- Natural language vs. HTML
-- Harmless text vs. Harmful text
+- Natural language vs. HTML formatting
+- Harmless Instructions vs. Harmful Instructions
 
-The first case we might imagine is quite simple to learn: there is a simple
+The first case is probably quite easy to learn: there is a simple
 pattern-matching problem for the model to spot between `"Hello, can I help you?"` and
-`"HELLO, CAN I HELP YOU?"`. Likewise, the second is hopefully quite easy to discern, but
+`"HELLO, CAN I HELP YOU?"`. Likewise, the second is hopefully quite easy but
 perhaps requires some more thinking: `"The main header of the page says Hello."` looks
-very different to `"<h1 class='main-header'> Hello </h1>"`, but it requires more
-knowledge to consistently separate the two.
+very different to `"<h1 class='main-header'> Hello </h1>"`.
 
-Finally, examples of harmless and harmful text might be really tricky to separate,
+Examples of harmless and harmful text are more tricky to separate,
 requiring genuine semantic understanding. For example, `"There is a bug in your code,
 so you should **refactor the function.**"` is quite harmless whereas `"There is a bug in
 your code, so you should **disable the firewall.**"` could be catastrophic.
 
 ![High level diagram of Linear Probes](images/linear-probes.svg){width="100%"}
+
+I ran three experiments across these example datasets. I used the simplest Linear Probe
+a logistic regression classifier. For a concept $c$ the probe $p_{c}$ is defined as,
+
+$$
+p_{c}= \sigma(W_{c} x + b_{c})
+$$ {#eq-logistic-regression}
+
+which in PyTorch can be written as,
+
+```{python}
+import torch.nn as nn
+
+class LinearProbe(nn.Module):
+    """Simple linear probe for binary classification."""
+    def __init__(self, hidden_dim):
+        super().__init__()
+        self.linear = nn.Linear(hidden_dim, 1)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        logits = self.linear(x)
+        probs = self.sigmoid(logits)
+        return probs
+```
+
+For each dataset I took just 50 pairs and trained probes on layer 16 activations $x_{16}$, the middle layer of
+Phi-3, for 200 epochs. Results for all three are on the tabs below:
+
+
+::: {.panel-tabset}
+
+## ALL CAPS
+
+![Loss and Accuracy for ALL CAPS Linear Probe](images/all_caps_results.svg){width="100%"}
+
+After some initial fluctuations by the 50th epoch the probe is certain when an input had
+proper punctuation or was in ALL CAPS.
+
+I generated the ALL CAPS dataset by hand by taking permutations subjects, verbs and
+things *e.g. The cat jumps over the fence*.
+
+
+## HTML
+
+![Loss and Accuracy for HTML Linear Probe](images/html_formatting_results.svg){width="100%"}
+
+Learning to distinguish natural language and HTML is even easier, less than 25
+epochs and the probe is certain!
+
+For the natural language I used samples from an Alpaca dataset [@alpaca] and for the
+HTML an Alpaca HTML dataset [@alpaca_html].
+
+
+## Harmful
+![Loss and Accuracy for Harmful Instructions Linear Probe](images/harmful_instructions_results.svg){width="100%"}
+
+Separating harmless and harmful instructions is, as expected, a little harder. By the
+75th epoch however the probe is again certain whether a prompt is harmful or not.
+
+For the harmless instructions I used samples from the an Alpaca dataset [@alpaca] and for
+the harmful instructions an advbench [@advbench].
+
+:::
+
+We see across all the final validation accuracy is 100% - the probes are capable of
+monitoring the thoughts of the model.
+
+Hopefully soon I will write a dedicated piece on Linear Probes, watch this space.
 
 ## References
 
