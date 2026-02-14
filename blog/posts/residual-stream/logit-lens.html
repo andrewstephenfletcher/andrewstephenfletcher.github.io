@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../site_libs/bootstrap/bootstrap-d561462725f41d7d39e5dc27a8efc17c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-ed7b9cc99f06e9b47f712dd9fcc9dedf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -166,35 +166,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<div id="e58a023d" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> huggingface_hub <span class="im">import</span> login</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>login()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="b3caae78" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> LogNorm</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm <span class="im">import</span> tqdm</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForCausalLM</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="b3caae78" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> LogNorm</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm <span class="im">import</span> tqdm</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForCausalLM</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="5f96b8fc" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clear MPS cache</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> torch.backends.mps.is_available():</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    torch.mps.empty_cache()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Also clear any cached gradients</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> gc</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>gc.collect()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>35</code></pre>
 </div>
-<div id="9f9f6376" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> <span class="st">"mps"</span> <span class="cf">if</span> torch.backends.mps.is_available() <span class="cf">else</span> <span class="st">"cpu"</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"microsoft/phi-3-mini-4k-instruct"</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    model_name).to(device)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>model</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="9f9f6376" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> <span class="st">"mps"</span> <span class="cf">if</span> torch.backends.mps.is_available() <span class="cf">else</span> <span class="st">"cpu"</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"microsoft/phi-3-mini-4k-instruct"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    model_name).to(device)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>model</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"142769a43ddf4a9d84e391411e59294c","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"8efb0b9930704d868fa776243497aee4","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>Phi3ForCausalLM(
   (model): Phi3Model(
     (embed_tokens): Embedding(32064, 3072, padding_idx=32000)
@@ -222,65 +230,420 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 )</code></pre>
 </div>
 </div>
-<div id="691290cf" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> <span class="st">"1:sunshine, 2:apple, 3:koala, 2:apple, 1:sunshine, 3:koala, 1:"</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>text_tokenized <span class="op">=</span> tokenizer.encode(text, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> model.generate(text_tokenized, num_beams<span class="op">=</span><span class="dv">4</span>, max_new_tokens<span class="op">=</span><span class="dv">3</span>, do_sample<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>text_decoded <span class="op">=</span> tokenizer.decode(output[<span class="dv">0</span>])</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(text_decoded)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="691290cf" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> <span class="st">"Citron: Acide</span><span class="ch">\n</span><span class="st">Sucre: Sucré</span><span class="ch">\n</span><span class="st">Piment: Épicé</span><span class="ch">\n</span><span class="st">Miel:"</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>text_tokenized <span class="op">=</span> tokenizer.encode(text, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> model.generate(text_tokenized, num_beams<span class="op">=</span><span class="dv">4</span>, max_new_tokens<span class="op">=</span><span class="dv">3</span>, do_sample<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>text_decoded <span class="op">=</span> tokenizer.decode(output[<span class="dv">0</span>])</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(text_decoded)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.</code></pre>
+</div>
 <div class="cell-output cell-output-stdout">
-<pre><code>1:sunshine, 2:apple, 3:koala, 2:apple, 1:sunshine, 3:koala, 1:sunshine</code></pre>
+<pre><code>Citron: Acide
+Sucre: Sucré
+Piment: Épicé
+Miel: Doux
+</code></pre>
 </div>
 </div>
 <div id="470b41bc" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> decode_token_with_logit_lens(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    model,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    device,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    tokenizer,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">input</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    tokens_to_gen<span class="op">=</span><span class="va">None</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> tokenizer(<span class="bu">input</span>, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> tokenizer.decode(inputs[<span class="st">'input_ids'</span>][<span class="dv">0</span>])</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> tokens_to_gen <span class="op">!=</span> <span class="va">None</span>:</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> model.generate(</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>            inputs[<span class="st">'input_ids'</span>],</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>            do_sample<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>            top_p<span class="op">=</span><span class="fl">0.95</span>,</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>            temperature<span class="op">=</span><span class="fl">0.001</span>,</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>            tok_k<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            max_new_tokens<span class="op">=</span>tokens_to_gen</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        new_token <span class="op">=</span> tokenizer.decode(output[<span class="dv">0</span>][<span class="op">-</span>tokens_to_gen:])</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        text <span class="op">+=</span> new_token</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        inputs <span class="op">=</span> tokenizer(text, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    text_tokens <span class="op">=</span> [tokenizer.decode(<span class="bu">id</span>) <span class="cf">for</span> <span class="bu">id</span> <span class="kw">in</span> inputs[<span class="st">'input_ids'</span>][<span class="dv">0</span>]]</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>classifier_head <span class="op">=</span> model.lm_head</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>hidden_states <span class="op">=</span> model(<span class="op">**</span>inputs, output_hidden_states<span class="op">=</span><span class="va">True</span>).hidden_states</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>decoded_intermediate_tokens <span class="op">=</span> {}</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>decoded_intermediate_logits <span class="op">=</span> {}</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> layer_id <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(hidden_states)):</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>        hidden_state <span class="op">=</span> hidden_states[layer_id]</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>        decoded_value <span class="op">=</span> classifier_head(hidden_state)</span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>        decoded_values <span class="op">=</span> torch.nn.functional.softmax(decoded_value, dim<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>        argmax <span class="op">=</span> torch.argmax(decoded_values, dim<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>        decoded_token <span class="op">=</span> [tokenizer.decode([<span class="bu">id</span>]) <span class="cf">for</span> <span class="bu">id</span> <span class="kw">in</span> argmax]</span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>        decoded_logit <span class="op">=</span> [decoded_values[<span class="dv">0</span>, it, argmax[<span class="dv">0</span>, it]].item() <span class="cf">for</span> it <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(argmax[<span class="dv">0</span>]))]</span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>        decoded_intermediate_tokens[layer_id] <span class="op">=</span> decoded_token</span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>        decoded_intermediate_logits[layer_id] <span class="op">=</span> decoded_logit</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>tokens <span class="op">=</span> <span class="bu">list</span>(decoded_intermediate_tokens.values())</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>logits <span class="op">=</span> <span class="bu">list</span>(decoded_intermediate_logits.values())</span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> {<span class="st">'text_tokens'</span>: text_tokens,</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>        <span class="st">'decoded_tokens'</span>: tokens,</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>        <span class="st">'decoded_logits'</span>: logits}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> decode_token_with_logitlens(model, device, tokenizer, <span class="bu">input</span>, tokens_to_gen<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">'''</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">    outputs a dictionary with {'decoded_tokens': [num_layers, seq_len], 'decoded_logits': [num_layers, seq_len]}</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">    '''</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> tokenizer(<span class="bu">input</span>, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> tokenizer.decode(inputs[<span class="st">'input_ids'</span>][<span class="dv">0</span>])</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># run the loop to generate new tokens after input, append to input and decode</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> tokens_to_gen <span class="op">!=</span> <span class="va">None</span>:</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># generate new tokens all at once; then append them to input, then logitlens them all</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> model.generate(</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>            inputs[<span class="st">'input_ids'</span>],</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>            do_sample<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>            top_p<span class="op">=</span><span class="fl">0.95</span>,</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>            temperature<span class="op">=</span><span class="fl">0.001</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>            top_k<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>            max_new_tokens<span class="op">=</span>tokens_to_gen,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        new_token <span class="op">=</span> tokenizer.decode(output[<span class="dv">0</span>][<span class="op">-</span>tokens_to_gen:])</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        text <span class="op">+=</span> new_token</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        inputs <span class="op">=</span> tokenizer(text, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    text_tokens <span class="op">=</span> [tokenizer.decode(<span class="bu">id</span>) <span class="cf">for</span> <span class="bu">id</span> <span class="kw">in</span> inputs[<span class="st">'input_ids'</span>][<span class="dv">0</span>]]</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># apply decoder lens</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    classifier_head <span class="op">=</span> model.lm_head <span class="co"># Linear(in_features=3072, out_features=32064, bias=False)</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    hidden_states <span class="op">=</span> model(<span class="op">**</span>inputs, output_hidden_states <span class="op">=</span> <span class="va">True</span>).hidden_states</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    decoded_intermediate_token <span class="op">=</span> {}</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    decoded_intermediate_logit <span class="op">=</span> {}</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> layer_id <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(hidden_states)):</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>            hidden_state <span class="op">=</span> hidden_states[layer_id]</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>            decoded_value <span class="op">=</span> classifier_head(hidden_state) <span class="co"># [batch, seq_len, vocab_size]</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>            <span class="co"># get probabilities</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>            decoded_values <span class="op">=</span> torch.nn.functional.softmax(decoded_value, dim<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>            <span class="co"># take max element</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>            argmax <span class="op">=</span> torch.argmax(decoded_values, dim<span class="op">=-</span><span class="dv">1</span>)[<span class="dv">0</span>] <span class="co"># select first element in batch</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>            <span class="co"># decode all tokens</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>            decoded_token <span class="op">=</span> [tokenizer.decode(<span class="bu">int</span>(el)) <span class="cf">for</span> el <span class="kw">in</span> argmax]</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>            decoded_logit <span class="op">=</span> [decoded_values[<span class="dv">0</span>, it, argmax[it]].item() <span class="cf">for</span> it <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(argmax))] <span class="co"># list of layers, per layer the sequence_length</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>            decoded_intermediate_token[layer_id] <span class="op">=</span> decoded_token</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>            decoded_intermediate_logit[layer_id] <span class="op">=</span> decoded_logit</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    tokens <span class="op">=</span> <span class="bu">list</span>(decoded_intermediate_token.values()) <span class="co"># [num_layers, seq_len]</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> <span class="bu">list</span>(decoded_intermediate_logit.values()) <span class="co"># [num_layers, seq_len]</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">'text_tokens'</span>:text_tokens, <span class="st">'decoded_tokens'</span>: tokens, <span class="st">'decoded_logits'</span>: logits}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="e4f59a41" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dict_output <span class="op">=</span> decode_token_with_logitlens(model, device, tokenizer, text, tokens_to_gen<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>decoded_tokens <span class="op">=</span> dict_output[<span class="st">'decoded_tokens'</span>]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>decoded_logits <span class="op">=</span> dict_output[<span class="st">'decoded_logits'</span>]</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>text_tokens <span class="op">=</span> dict_output[<span class="st">'text_tokens'</span>]</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(text_tokens), text_tokens)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>25 ['Cit', 'ron', ':', 'A', 'cide', '\n', 'Su', 'cre', ':', 'S', 'uc', 'ré', '\n', 'P', 'iment', ':', 'É', 'pic', 'é', '\n', 'M', 'iel', ':', 'D', 'oux']</code></pre>
+</div>
+</div>
+<div id="96cb587e" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> element <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(decoded_tokens)):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(decoded_tokens[element])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['izen', 'unci', 'Screen', 'bove', 'zat', 'Datos', 'ites', 'opening', 'Screen', 'orted', 'Stra', 'imas', 'Datos', 'rior', 'Db', 'Screen', 'cze', 'éd', 'parc', 'Datos', 'arch', 'merge', 'Screen', 'enis', 'Terr']
+['míst', '☺', 'míst', 'míst', '🌍', 'míst', 'becom', 'míst', 'míst', '↵', '\x97', '̶', 'míst', '↵', 'hbox', 'míst', '̶', '\x97', '☺', 'míst', '↵', 'Ê', 'míst', '♯', 'Č']
+['míst', '☺', 'míst', 'míst', '￼', 'míst', 'cí', 'míst', 'míst', 'míst', '›', '̶', 'míst', 'míst', 'ão', 'míst', '̶', '�', '☺', 'míst', 'cí', 'Vé', '─', '♯', 'Č']
+['option', 'Niem', '\x97', 'mí', 'has', '\x97', '马', 'pick', 'infatti', '⇔', '›', 'men', '\x97', 'OL', 'wind', '\x97', '⇔', 'Sver', 'living', '\x97', '↵', 'Vé', '\x97', 'Martí', 'Č']
+['option', 'ouc', 'highly', 'ero', 'practices', '\x97', 'ivi', 'int', 'infatti', 'míst', 'lande', 'ợ', '￼', 'OL', 'al', '\x97', '⟶', 'nic', 'surr', '\x97', '⇔', 'rig', '\x97', 'LT', 'fil']
+['option', 'r', 'Fich', 'mí', 'ity', '￼', '⟶', 'at', 'Fich', 'echter', 'uro', 'exclus', '￼', 'urg', 'tab', 'Fon', '🌍', 'nick', 'bean', '￼', 'cí', 'rig', 'Fon', 'Martí', 'ﬁ']
+['option', 'ville', 'alberga', 'dynamically', 'ogen', '￼', '♦', 'abet', 'ば', 'míst', '☺', 'ones', '￼', 'cí', 'anu', '⇔', 'Err', 'urg', 'itos', '￼', 'cí', 'rig', 'prima', 'Martí', 'brow']
+['option', '\u2009', '⇔', 'ero', 'gra', '￼', 'pon', 'LES', 'cogn', '⇔', '☺', 'ば', '￼', 'cí', 'ão', '⇔', 'Err', 'ere', '➖', '￼', 'penas', 'pan', 'prima', '\x97', 'brow']
+['option', '\u2009', '⇔', 'dynamically', 'ity', '✔', 'cre', 'ville', 'prima', 'OL', 'loc', 'emer', '￼', 'urg', 'on', 'prima', 'cot', 'ere', 'acon', '￼', 'urg', 'de', 'prima', '↔', '-']
+['option', 'isch', '{\r', 'oret', 'de', '↔', 'cre', 'de', 'prima', 'urg', 'loc', 'taste', 'ext', 'OL', 'on', 'cons', 'aster', 'ere', 'ol', 'ext', 'urg', 'de', 'cons', 'our', '-']
+['option', 'soft', '{\r', 'war', 'de', '✅', 'pon', 'de', 'pre', 'urg', 'loc', ']],', 'odor', 'FA', 'on', 'pre', 'cot', 'ere', 'flav', 'soft', 'urg', 'de', 'prima', '↔', '-']
+['option', 'iar', '{\r', 'результате', 'de', 'con', 'oc', 'de', 'pre', 'urg', 'ita', 'exc', 'soft', 'ü', 'on', 'pre', 'oc', 'результате', 'ien', 'soft', 'urg', 'de', 'op', 'ign', '-']
+['option', 'iar', '{\r', 'war', 'de', '});\r', 'qu', 'de', 'pre', 'eng', 'е', 'sens', 'soft', 'ü', 'on', 'pre', 'ol', 'ere', 'ien', 'soft', 'ü', 'eli', 'prom', 'lam', '-']
+['option', 'iar', '{\r', 'ali', 'ity', '});\r', 'con', 'de', 'prom', 'eng', 'ill', 'Tout', 'soft', 'ü', 'on', 'rig', 'lam', 'ere', 'flav', 'etc', 'adr', 'eli', 'prom', 'riv', '-']
+['option', 'ica', '{\r', 'ali', 'de', '{\r', 'im', 'de', 'li', 'urg', 'ub', 'de', 'adr', 'urg', 'on', 'sens', 'lam', 'ere', '/', 'etc', 'urg', 'eli', 'sens', 'ill', '-']
+['option', 'ica', '{\r', 'ali', 'ity', '{\r', 'ver', 'de', 'li', 'urg', 'ub', 'ais', '\ufeff', 'urg', 'on', 'sens', 'vol', 'ere', 'option', 'etc', 'ast', 'loc', 'war', 'urg', '-']
+['option', 'ica', '{\r', 'myster', 'ity', '{\r', 'ft', 'de', 'ase', 'urg', 'amer', ']]', '{`', 'urg', 'on', 'sens', 'lam', 'ere', 'option', 'etc', 'ast', 'loc', 'sens', 'riv', '-']
+['option', 'ica', '{\r', 'lem', 'de', '});\r', 'pect', 'de', 'sens', 'urg', 'ub', '\ufeff', 'etc', 'urg', 'on', 'sens', 'vol', 'ere', '/', 'etc', 'ast', 'loc', 'sens', 'riv', '-']
+['option', 'ic', '{\r', 'lem', 'de', '});\r', 'ft', 'de', 'sens', 'ill', 'ub', '"}', '{`', 'urg', 'al', 'sens', 'vol', 'enter', 'taste', 'etc', 'ast', 'loc', 'sens', 'riv', 'soft']
+['option', 'et', '{\r', 'modern', 'de', '&lt;|endoftext|&gt;', 'il', 'de', '', 'our', 'ub', '/', '{`', 'urg', 'al', 'sens', 'vol', 'enter', '/', '&lt;|endoftext|&gt;', 'ast', 's', 'sens', 'urg', '-']
+['option', 'et', '{\r', 'compreh', 'de', '          ', 'il', 'de', 'b', 'our', 'ub', '\n', 'etc', 'urg', 'al', 'sens', 'vol', 'enter', '/', 'etc', 'our', ':', 'sens', 'il', '-']
+['option', 'et', '{\r', 'compreh', 'de', '{\r', 'ven', 'de', '', 'our', 'our', '\n', 'etc', 'eg', 'al', 'sens', 'vol', 'enter', '&lt;|endoftext|&gt;', 'etc', 'ur', ':', 'de', 'ur', '\n']
+['option', 'et', '{\r', 'Sidenote', 'de', '\t', 'ffic', 'de', '', 'uc', 'ub', '\n', 't', 'eg', 'al', 's', 'vol', 'enter', '\n', '&lt;|endoftext|&gt;', 'ast', ':', 'sweet', 'iffer', '\n']
+['option', 'et', '\r', 'Sidenote', 'de', '✅', 'plement', ':', '', 'que', 'urs', '\n', 't', 'eg', 'o', 'd', 'vol', 'enter', '/', 'le', 'ast', ':', 'sweet', 'iffer', '\n']
+['option', 'et', '"', 'Sidenote', 'ac', '✅', 'plement', ':', '', 'uc', 'rose', '\n', '', 'ast', 'ary', 'bitter', 'vol', 'enter', '\n', '&lt;|endoftext|&gt;', 'ast', ':', 'sweet', 'ivid', '\n']
+['option', 'et', '"', 'Sidenote', 'le', '', 'plement', ':', 'sugar', 'weet', 'rose', '\n', 'gr', 'ast', 'de', 'bitter', 'vol', 'enter', '\n', 'c', 'our', ':', 'sweet', 'ivid', '\n']
+['option', 'et', '', 'Sidenote', 'ac', '', 'plement', ':', 'Sug', 'weet', 'rose', '\n', 'c', 'ig', ':', 'hot', 'vol', 'enter', '\n', 'c', 'ature', ':', 'sweet', 'ivid', '\n']
+['option', 'et', 'Sidenote', 'Sidenote', 'ac', '', 'plement', ':', 'sol', 'weet', 'rose', '\n', '', 'iment', ':', 'sp', 'colog', 'enter', '\n', 'D', 'astic', ':', 'sweet', 'ul', '\n']
+['option', 'et', 'Sidenote', 'Sidenote', 's', '', 'plement', ':', '', 'uc', 'rose', '\n', '', 'iment', ':', 'sp', 'per', 'et', '\n', 'po', 'astic', ':', 'swe', 'ul', '\n']
+['option', 'et', '', 'Sidenote', '', '', 'cc', ':', '', 'atur', 'id', '\n', '', 'iment', ':', '', 'per', 'ur', '\n', '', 'int', ':', 'D', 'ess', '\n']
+['Ł', 'et', '', 'Sidenote', '', '\n', 'cre', ':', '', 'uc', 'rose', '\n', '', 'iment', ':', '', 'per', 'ur', '\n', 'A', 'ent', ':', 'D', 'u', '\n']
+['\u202f', 'i', '', '', '', '\n', 'it', ':', '', 'uc', 'rose', '\n', '\n', 'ain', ':', 'A', 'p', 'ur', '\n', '\n', 'ent', ':', 'D', 'u', '\n']
+['izen', 'ella', '\n', 'Cit', 'cit', '\n', 'ivi', ':', 'Gl', 'uc', 'ré', '\n', '\n', 'om', ':', 'A', 'pic', 'é', '\n', 'C', 'iel', ':', 'D', 'oux', '\n']</code></pre>
+</div>
+</div>
+<div id="1927d4a8" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tokens_viz <span class="op">=</span> [tok <span class="cf">for</span> tok <span class="kw">in</span> decoded_tokens] <span class="co"># [num_layers, num_tokens]</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>logits_viz <span class="op">=</span> np.array([log <span class="cf">for</span> log <span class="kw">in</span> decoded_logits]) <span class="co"># [num_layers, num_tokens]</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> [it <span class="cf">for</span> it <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(text_tokens))]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> [tok <span class="cf">for</span> tok <span class="kw">in</span> text_tokens]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>col_labels <span class="op">=</span> [<span class="bu">str</span>(a_)<span class="op">+</span><span class="st">': '</span><span class="op">+</span>b_ <span class="cf">for</span> a_, b_ <span class="kw">in</span> <span class="bu">zip</span>(a, b)]</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> plt.Normalize(logits_viz.<span class="bu">min</span>()<span class="op">-</span><span class="dv">1</span>, logits_viz.<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>colours <span class="op">=</span> plt.cm.cool(norm(logits_viz))</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), dpi<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># hide axes</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>fig.patch.set_visible(<span class="va">False</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">'off'</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">'tight'</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>img <span class="op">=</span> plt.imshow(norm(logits_viz), cmap<span class="op">=</span><span class="st">"cool"</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>img.set_visible(<span class="va">False</span>)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>ax.table(cellText<span class="op">=</span>tokens_viz, rowLabels<span class="op">=</span>[lay <span class="cf">for</span> lay <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(decoded_tokens))], colLabels<span class="op">=</span>col_labels, colWidths <span class="op">=</span> [<span class="fl">0.2</span>]<span class="op">*</span>logits_viz.shape[<span class="dv">1</span>], loc<span class="op">=</span><span class="st">'center'</span>, cellColours<span class="op">=</span>img.to_rgba(norm(logits_viz)))</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/fletcaw1/Documents/Personal/personal-repos/andrewstephenfletcher.github.io/.venv/lib/python3.12/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 127757 (\N{EARTH GLOBE EUROPE-AFRICA}) missing from font(s) DejaVu Sans.
+  fig.canvas.print_figure(bytes_io, **kw)
+/Users/fletcaw1/Documents/Personal/personal-repos/andrewstephenfletcher.github.io/.venv/lib/python3.12/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 151 (\x97) missing from font(s) DejaVu Sans.
+  fig.canvas.print_figure(bytes_io, **kw)
+/Users/fletcaw1/Documents/Personal/personal-repos/andrewstephenfletcher.github.io/.venv/lib/python3.12/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 39532 (\N{CJK UNIFIED IDEOGRAPH-9A6C}) missing from font(s) DejaVu Sans.
+  fig.canvas.print_figure(bytes_io, **kw)
+/Users/fletcaw1/Documents/Personal/personal-repos/andrewstephenfletcher.github.io/.venv/lib/python3.12/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 12400 (\N{HIRAGANA LETTER BA}) missing from font(s) DejaVu Sans.
+  fig.canvas.print_figure(bytes_io, **kw)
+/Users/fletcaw1/Documents/Personal/personal-repos/andrewstephenfletcher.github.io/.venv/lib/python3.12/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 10134 (\N{HEAVY MINUS SIGN}) missing from font(s) DejaVu Sans.
+  fig.canvas.print_figure(bytes_io, **kw)
+) missing from font(s) DejaVu Sans.personal-repos/andrewstephenfletcher.github.io/.venv/lib/python3.12/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 13 (
+  fig.canvas.print_figure(bytes_io, **kw)
+/Users/fletcaw1/Documents/Personal/personal-repos/andrewstephenfletcher.github.io/.venv/lib/python3.12/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 9989 (\N{WHITE HEAVY CHECK MARK}) missing from font(s) DejaVu Sans.
+  fig.canvas.print_figure(bytes_io, **kw)
+/Users/fletcaw1/Documents/Personal/personal-repos/andrewstephenfletcher.github.io/.venv/lib/python3.12/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 9 ( ) missing from font(s) DejaVu Sans.
+  fig.canvas.print_figure(bytes_io, **kw)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logit-lens_files/figure-html/cell-9-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="b42ca1f4" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find where "Miel: Doux" tokens start</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>search_text <span class="op">=</span> <span class="st">"Miel: Doux"</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>full_text <span class="op">=</span> <span class="st">''</span>.join(text_tokens)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the token indices for "Miel: Doux"</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># First, let's see which tokens contain these characters</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>miel_start_idx <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, token <span class="kw">in</span> <span class="bu">enumerate</span>(text_tokens):</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">"Miel"</span> <span class="kw">in</span> token:</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        miel_start_idx <span class="op">=</span> i</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Print to see what we found</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Full text tokens: </span><span class="sc">{</span>text_tokens<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Miel starts at token index: </span><span class="sc">{</span>miel_start_idx<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's look at a few tokens around "Miel:"</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> miel_start_idx <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Show tokens from Miel onwards (adjust range as needed)</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    to_viz <span class="op">=</span> (miel_start_idx, <span class="bu">min</span>(miel_start_idx <span class="op">+</span> <span class="dv">5</span>, <span class="bu">len</span>(text_tokens)))</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fallback: show last few tokens if we can't find "Miel"</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    to_viz <span class="op">=</span> (<span class="bu">max</span>(<span class="dv">0</span>, <span class="bu">len</span>(text_tokens) <span class="op">-</span> <span class="dv">5</span>), <span class="bu">len</span>(text_tokens))</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Visualizing tokens </span><span class="sc">{</span>to_viz[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>to_viz[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>text_tokens[to_viz[<span class="dv">0</span>]:to_viz[<span class="dv">1</span>]]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>tokens_viz <span class="op">=</span> [tok[to_viz[<span class="dv">0</span>]:to_viz[<span class="dv">1</span>]] <span class="cf">for</span> tok <span class="kw">in</span> decoded_tokens]</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>logits_viz <span class="op">=</span> np.array([logit[to_viz[<span class="dv">0</span>]:to_viz[<span class="dv">1</span>]] <span class="cf">for</span> logit <span class="kw">in</span> decoded_logits])</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> [it <span class="cf">for</span> it <span class="kw">in</span> <span class="bu">range</span>(to_viz[<span class="dv">0</span>], to_viz[<span class="dv">1</span>])]</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> [tok <span class="cf">for</span> tok <span class="kw">in</span> text_tokens[to_viz[<span class="dv">0</span>]:to_viz[<span class="dv">1</span>]]]</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>col_labels <span class="op">=</span> [<span class="bu">str</span>(a_)<span class="op">+</span><span class="st">': '</span><span class="op">+</span>b_ <span class="cf">for</span> a_, b_ <span class="kw">in</span> <span class="bu">zip</span>(a, b)]</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> plt.Normalize(logits_viz.<span class="bu">min</span>()<span class="op">-</span><span class="dv">1</span>, logits_viz.<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>colours <span class="op">=</span> plt.cm.cool(norm(logits_viz))</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), dpi<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>fig.patch.set_visible(<span class="va">False</span>)</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">'off'</span>)</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">'tight'</span>)</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>img <span class="op">=</span> plt.imshow(norm(logits_viz), cmap<span class="op">=</span><span class="st">"cool"</span>)</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>img.set_visible(<span class="va">False</span>)</span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>ax.table(cellText<span class="op">=</span>tokens_viz, rowLabels<span class="op">=</span>[lay <span class="cf">for</span> lay <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(decoded_tokens))], colLabels<span class="op">=</span>col_labels, colWidths <span class="op">=</span> [<span class="fl">0.2</span>]<span class="op">*</span>logits_viz.shape[<span class="dv">1</span>], loc<span class="op">=</span><span class="st">'center'</span>, cellColours<span class="op">=</span>img.to_rgba(norm(logits_viz)))</span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Full text tokens: ['Cit', 'ron', ':', 'A', 'cide', '\n', 'Su', 'cre', ':', 'S', 'uc', 'ré', '\n', 'P', 'iment', ':', 'É', 'pic', 'é', '\n', 'M', 'iel', ':', 'D', 'oux']
+Miel starts at token index: None
+Visualizing tokens 20 to 25: ['M', 'iel', ':', 'D', 'oux']</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logit-lens_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="9d3c473d" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_pretty_logit_lens(tokens_viz, logits_viz, text_tokens, start_idx, end_idx, start_layer<span class="op">=</span><span class="dv">0</span>):</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Creates a professional Logit Lens visualization.</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Filter to only show layers from start_layer onwards</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    tokens_viz <span class="op">=</span> tokens_viz[start_layer:]</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    logits_viz <span class="op">=</span> logits_viz[start_layer:]</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Setup Data Labels</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rows: Layers, Columns: Pos + Token</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    row_labels <span class="op">=</span> [<span class="ss">f"Layer </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(start_layer, start_layer <span class="op">+</span> <span class="bu">len</span>(tokens_viz))]</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    col_labels <span class="op">=</span> [<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>text_tokens[i]<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(start_idx, end_idx)]</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Styling Parameters</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="bu">max</span>(<span class="dv">12</span>, <span class="bu">len</span>(col_labels)<span class="op">*</span><span class="dv">2</span>), <span class="bu">len</span>(row_labels)<span class="op">*</span><span class="fl">0.6</span>))</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    sns.set_theme(style<span class="op">=</span><span class="st">"white"</span>)</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Create Heatmap</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># We use logits_viz for the colors and tokens_viz for the text annotations</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> sns.heatmap(</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>        logits_viz,</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>        annot<span class="op">=</span>tokens_viz,</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">=</span><span class="st">""</span>,                   <span class="co"># We are passing strings, so no formatting</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">"mako"</span>,              <span class="co"># Standard, readable colormap (try 'magma' or 'viridis' too)</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>        linewidths<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>        linecolor<span class="op">=</span><span class="st">'white'</span>,</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>        cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Logit Magnitude'</span>},</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>        xticklabels<span class="op">=</span>col_labels,</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>        yticklabels<span class="op">=</span>row_labels,</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>        annot_kws<span class="op">=</span>{<span class="st">"size"</span>: <span class="dv">10</span>, <span class="st">"weight"</span>: <span class="st">"bold"</span>}</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. Refine Labels</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>    ax.xaxis.tick_top() <span class="co"># Move tokens to the top for easier reading</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>    ax.xaxis.set_label_position(<span class="st">'top'</span>)</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>    plt.xticks(rotation<span class="op">=</span><span class="dv">45</span>, ha<span class="op">=</span><span class="st">'left'</span>)</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>    plt.yticks(rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="st">"Logit Lens: Evolution of Token Predictions"</span>, pad<span class="op">=</span><span class="dv">40</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>    plt.savefig(</span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>        <span class="st">"images/logit_lens_viz.svg"</span>,</span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>        <span class="bu">format</span><span class="op">=</span><span class="st">'svg'</span>,</span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>        bbox_inches<span class="op">=</span><span class="st">'tight'</span>,</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>        transparent<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>        metadata<span class="op">=</span>{<span class="st">'Creator'</span>: <span class="st">'Logit Lens Visualizer'</span>}</span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Integration with your existing variables ---</span></span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the slice of data needed</span></span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a>s_idx, e_idx <span class="op">=</span> to_viz</span>
+<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a>final_tokens <span class="op">=</span> [lay[s_idx:e_idx] <span class="cf">for</span> lay <span class="kw">in</span> decoded_tokens]</span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>final_logits <span class="op">=</span> np.array([logit[s_idx:e_idx] <span class="cf">for</span> logit <span class="kw">in</span> decoded_logits])</span>
+<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a><span class="co"># Call with start_layer=12 to begin at Layer 12</span></span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a>plot_pretty_logit_lens(final_tokens, final_logits, text_tokens, s_idx, e_idx, start_layer<span class="op">=</span><span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logit-lens_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="f6229d05" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> tokenizer(text, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the hidden state at layer 24, token position 22</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>layer_24_hidden <span class="op">=</span> model(<span class="op">**</span>tokenizer(tokenizer.decode(inputs[<span class="st">'input_ids'</span>][<span class="dv">0</span>]),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>                                    return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device),</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>                                    output_hidden_states<span class="op">=</span><span class="va">True</span>).hidden_states[<span class="dv">22</span>]</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply classifier head to get logits for all vocabulary</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> model.lm_head(layer_24_hidden[<span class="dv">0</span>, <span class="dv">22</span>, :])  <span class="co"># [vocab_size]</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    probs <span class="op">=</span> torch.nn.functional.softmax(logits, dim<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get top 10</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    top_10_probs, top_10_indices <span class="op">=</span> torch.topk(probs, <span class="dv">10</span>)</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Decode tokens</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    top_10_tokens <span class="op">=</span> [tokenizer.decode(<span class="bu">int</span>(idx)) <span class="cf">for</span> idx <span class="kw">in</span> top_10_indices]</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    top_10_probs <span class="op">=</span> top_10_probs.<span class="bu">float</span>().cpu().numpy()  <span class="co"># Convert to float32 first</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Reverse for display (highest at top)</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>top_10_tokens <span class="op">=</span> top_10_tokens[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>top_10_probs <span class="op">=</span> top_10_probs[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Create horizontal bar chart</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>y_positions <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(top_10_tokens))</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>ax.barh(y_positions, top_10_probs, color<span class="op">=</span><span class="st">'steelblue'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(y_positions)</span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels([<span class="ss">f"</span><span class="sc">{</span>token<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> token <span class="kw">in</span> top_10_tokens])</span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Softmax Probability'</span>)</span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f'Layer 24, Token Position 22 ("</span><span class="sc">{</span>text_tokens[<span class="dv">22</span>]<span class="sc">}</span><span class="ss">") - Top 10 Predictions'</span>)</span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, <span class="bu">max</span>(top_10_probs) <span class="op">*</span> <span class="fl">1.1</span>)</span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">'x'</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, prob <span class="kw">in</span> <span class="bu">enumerate</span>(top_10_probs):</span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a>    ax.text(prob <span class="op">+</span> <span class="fl">0.001</span>, i, <span class="ss">f'</span><span class="sc">{</span>prob<span class="sc">:.4f}</span><span class="ss">'</span>, va<span class="op">=</span><span class="st">'center'</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-45"><a href="#cb19-45" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb19-46"><a href="#cb19-46" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logit-lens_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="4554de9a" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> tokenizer(text, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the hidden state at layer 24, token position 22</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>layer_24_hidden <span class="op">=</span> model(<span class="op">**</span>tokenizer(tokenizer.decode(inputs[<span class="st">'input_ids'</span>][<span class="dv">0</span>]),</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>                                    return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device),</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>                                    output_hidden_states<span class="op">=</span><span class="va">True</span>).hidden_states[<span class="dv">22</span>]</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply classifier head to get logits for all vocabulary</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> model.lm_head(layer_24_hidden[<span class="dv">0</span>, <span class="dv">22</span>, :])  <span class="co"># [vocab_size]</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    probs <span class="op">=</span> torch.nn.functional.softmax(logits, dim<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get top 10</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    top_10_probs, top_10_indices <span class="op">=</span> torch.topk(probs, <span class="dv">10</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get corresponding logits</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    top_10_logits <span class="op">=</span> logits[top_10_indices]</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Decode tokens</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>    top_10_tokens <span class="op">=</span> [tokenizer.decode(<span class="bu">int</span>(idx)) <span class="cf">for</span> idx <span class="kw">in</span> top_10_indices]</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    top_10_probs <span class="op">=</span> top_10_probs.<span class="bu">float</span>().cpu().numpy()</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    top_10_logits <span class="op">=</span> top_10_logits.<span class="bu">float</span>().cpu().numpy()</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Reverse for display (highest at top)</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>top_10_tokens <span class="op">=</span> top_10_tokens[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>top_10_probs <span class="op">=</span> top_10_probs[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>top_10_logits <span class="op">=</span> top_10_logits[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Create horizontal bar chart</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>y_positions <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(top_10_tokens))</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>ax.barh(y_positions, top_10_probs, color<span class="op">=</span><span class="st">'steelblue'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(y_positions)</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels([<span class="ss">f"</span><span class="sc">{</span>token<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> token <span class="kw">in</span> top_10_tokens])</span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Softmax Probability'</span>)</span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f'Layer 24, Token Position 22 ("</span><span class="sc">{</span>text_tokens[<span class="dv">22</span>]<span class="sc">}</span><span class="ss">") - Top 10 Predictions'</span>)</span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, <span class="bu">max</span>(top_10_probs) <span class="op">*</span> <span class="fl">1.1</span>)</span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">'x'</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (prob, logit) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(top_10_probs, top_10_logits)):</span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a>    ax.text(prob <span class="op">+</span> <span class="fl">0.001</span>, i, <span class="ss">f'</span><span class="sc">{</span>prob<span class="sc">:.4f}</span><span class="ss"> (logit: </span><span class="sc">{</span>logit<span class="sc">:.2f}</span><span class="ss">)'</span>, va<span class="op">=</span><span class="st">'center'</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logit-lens_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="ddf98529" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import pickle</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># # Save</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># with open('logit_lens_results.pkl', 'wb') as f:</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     pickle.dump(dict_output, f)</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># # Load later</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co"># with open('logit_lens_results.pkl', 'rb') as f:</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">#     dict_output = pickle.load(f)</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">#     decoded_tokens = dict_output['decoded_tokens']</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co">#     decoded_logits = dict_output['decoded_logits']</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co">#     text_tokens = dict_output['text_tokens']</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

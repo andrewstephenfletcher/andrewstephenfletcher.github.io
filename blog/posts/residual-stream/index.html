@@ -21,6 +21,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 /* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
@@ -61,7 +96,7 @@ div.csl-indent {
 <link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../site_libs/bootstrap/bootstrap-d561462725f41d7d39e5dc27a8efc17c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-ed7b9cc99f06e9b47f712dd9fcc9dedf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -233,7 +268,7 @@ window.Quarto = {
 <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;" class="page-columns page-full">
 <p>“The capital of the country containing Manchester<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> is”</p>
 <div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Getting a sensible answer from small LLMs is hard, GPT-2 prompted with “The capital of the country containing Lyon is” returned “the” with 30% confidence and “France” with only 4% confidence.</p></div></div></div>
-<p>We will follow the final token “is” as this is the token from which the model will predict the next token.</p>
+<p>I follow the final token “is” as this is the token from which the model will predict the next token.</p>
 <p>The first step is to use the Token embedding, <span class="math inline">\(W_{E} \in \mathbb{R}^{d_{model} \times d_{vocab}}\)</span>, which acts as a look-up table from the token “is”, which we represent initially by the Token index <span class="math inline">\(t \in \mathbb{R}^{d_{vocab}}\)</span>, to the <span class="math inline">\(d_{model}\)</span> vector that represents it,</p>
 <p><span id="eq-embedding"><span class="math display">\[
 x_{0} = W_{E} t
@@ -329,6 +364,22 @@ T(t) = W_{U} x_{-1}
 </div>
 </div>
 </div>
+<p>A great example of using a Logit Lens is the paper “Do Llamas Work in English? On the Latent Language of Multilingual Transformers” <span class="citation" data-cites="do-llamas-work-in-english">(<a href="#ref-do-llamas-work-in-english" role="doc-biblioref">Wendler et al. 2024</a>)</span>. Which gave models a translation task and applied Logit Lens to see if the model thought in prompt language or English.</p>
+<p>I have replicated this experiment using Phi-3 and a simple prompt where we expect the model to spot the pattern in French and return the correct flavour associated with the food,</p>
+<div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;">
+<p>“Citron: Acide<br>
+Sucre: Sucré<br>
+Piment: Épicé<br>
+Miel:”</p>
+</div>
+<p>Where we would expect a response <em>Doux</em> telling us that <em>Miel/Honey</em> has a <em>Sweet/Mild</em> flavour.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/logit_lens_viz.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Evolution of tokens seen with Logit Lens</figcaption>
+</figure>
+</div>
+<p>In the images above we can see a successful replication of <span class="citation" data-cites="do-llamas-work-in-english">(<a href="#ref-do-llamas-work-in-english" role="doc-biblioref">Wendler et al. 2024</a>)</span>, from layer 22 to 27 the model is thinking <code>sweet</code> in English only in the last 4 layers does it pivot and prepare to output the correct French word <code>Doux</code>!</p>
 </section>
 <section id="linear-probes" class="level3">
 <h3 class="anchored" data-anchor-id="linear-probes">Linear Probes</h3>
@@ -336,7 +387,7 @@ T(t) = W_{U} x_{-1}
 <ul>
 <li>Proper punctuation vs.&nbsp;ALL CAPS</li>
 <li>Natural language vs.&nbsp;HTML</li>
-<li>Harmless text vs.&nbsp;Harmful text</li>
+<li>Harmless Instructions vs.&nbsp;Harmful Instructions</li>
 </ul>
 <p>The first case we might imagine is quite simple to learn: there is a simple pattern-matching problem for the model to spot between <code>"Hello, can I help you?"</code> and <code>"HELLO, CAN I HELP YOU?"</code>. Likewise, the second is hopefully quite easy to discern, but perhaps requires some more thinking: <code>"The main header of the page says Hello."</code> looks very different to <code>"&lt;h1 class='main-header'&gt; Hello &lt;/h1&gt;"</code>, but it requires more knowledge to consistently separate the two.</p>
 <p>Finally, examples of harmless and harmful text might be really tricky to separate, requiring genuine semantic understanding. For example, <code>"There is a bug in your code, so you should **refactor the function.**"</code> is quite harmless whereas <code>"There is a bug in your code, so you should **disable the firewall.**"</code> could be catastrophic.</p>
@@ -345,6 +396,60 @@ T(t) = W_{U} x_{-1}
 <p><img src="images/linear-probes.svg" class="img-fluid figure-img" style="width:100.0%"></p>
 <figcaption>High level diagram of Linear Probes</figcaption>
 </figure>
+</div>
+<p>I ran three experiments across these example datasets. I used the simplest Linear Probe a logistic regression such that for a concept <span class="math inline">\(c\)</span> the probe <span class="math inline">\(p_{c}\)</span> is defined as,</p>
+<p><span id="eq-logistic-regression"><span class="math display">\[
+p_{c}= \sigma(\mathbf{w_{c}}^\top \mathbf{x} + b_{c})
+\tag{9}\]</span></span></p>
+<p>which in PyTorch can be written as,</p>
+<div id="15b1dcb4" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinearProbe(nn.Module):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Simple linear probe for binary classification."""</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, hidden_dim):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.linear <span class="op">=</span> nn.Linear(hidden_dim, <span class="dv">1</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sigmoid <span class="op">=</span> nn.Sigmoid()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        logits <span class="op">=</span> <span class="va">self</span>.linear(x)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        probs <span class="op">=</span> <span class="va">self</span>.sigmoid(logits)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> probs</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>For each dataset I took just 50 pairs and trained probes on layer 16, the middle of Phi-3, for 200 epochs. We run inference through Phi-3 and save the hidden states <span class="math inline">\(\mathbf{x}_{16}\)</span> on which we can train a linear probes. Results for all three are on the tabs below:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">ALL CAPS</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">HTML</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Harmful</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/all_caps_results.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Loss and Accuracy for ALL CAPS Linear Probe</figcaption>
+</figure>
+</div>
+<p>After some initial fluctuations by the 50th epoch the probe is certain when an input was normal text or in ALL CAPS.</p>
+<p>I generated the ALL CAPS dataset by hand by taking permutations subjects, verbs and things <em>e.g.&nbsp;The cat jumps over the fence</em>.</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/html_formatting_results.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Loss and Accuracy for HTML Linear Probe</figcaption>
+</figure>
+</div>
+<p>Learning to distinguish normal text and HTML is even easier, less than 25 epochs and the probe is certain!</p>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/harmful_instructions_results.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>Loss and Accuracy for Harmful Instructions Linear Probe</figcaption>
+</figure>
+</div>
+<p>Separating harmless and harmful instructions is, as expected, a little harder. By the 75th epoch however the probe is again certain whether a prompt is harmful or not.</p>
+</div>
+</div>
 </div>
 </section>
 </section>
@@ -380,6 +485,9 @@ nostalgebraist. 2020. <span>“Interpreting GPT: The Logit Lens.”</span> <a hr
 </div>
 <div id="ref-3b1b-backpropagation" class="csl-entry" role="listitem">
 Sanderson, Grant. 2017. <span>“Backpropagation Calculus | Deep Learning Chapter 4.”</span> <a href="https://www.3blue1brown.com/lessons/backpropagation-calculus" class="uri">https://www.3blue1brown.com/lessons/backpropagation-calculus</a>.
+</div>
+<div id="ref-do-llamas-work-in-english" class="csl-entry" role="listitem">
+Wendler, Chris, Veniamin Veselovsky, Giovanni Monea, and Robert West. 2024. <span>“Do Llamas Work in English? On the Latent Language of Multilingual Transformers.”</span> <a href="https://arxiv.org/abs/2402.10588">https://arxiv.org/abs/2402.10588</a>.
 </div>
 <div id="ref-Hyper-Connections" class="csl-entry" role="listitem">
 Zhu, Defa, Hongzhi Huang, Zihao Huang, Yutao Zeng, Yunyao Mao, Banggu Wu, Qiyang Min, and Xun Zhou. 2025. <span>“Hyper-Connections.”</span> <a href="https://arxiv.org/abs/2409.19606">https://arxiv.org/abs/2409.19606</a>.
