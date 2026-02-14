@@ -228,7 +228,7 @@ window.Quarto = {
   <div class="quarto-categories">
     <div class="quarto-category">mechanistic interpretability</div>
     <div class="quarto-category">residual stream</div>
-    <div class="quarto-category">latent space monitoring</div>
+    <div class="quarto-category">linear probes</div>
   </div>
   </div>
 
@@ -265,31 +265,31 @@ window.Quarto = {
 <li>Unembedding, <span class="math inline">\(W_{U}\)</span></li>
 </ul>
 <p>I will give a high level overview of what some of these elements do by considering the input sequence,</p>
-<div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;" class="page-columns page-full">
-<p>“The capital of the country containing Manchester<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> is”</p>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Getting a sensible answer from small LLMs is hard, GPT-2 prompted with “The capital of the country containing Lyon is” returned “the” with 30% confidence and “France” with only 4% confidence.</p></div></div></div>
-<p>I follow the final token “is” as this is the token from which the model will predict the next token.</p>
-<p>The first step is to use the Token embedding, <span class="math inline">\(W_{E} \in \mathbb{R}^{d_{model} \times d_{vocab}}\)</span>, which acts as a look-up table from the token “is”, which we represent initially by the Token index <span class="math inline">\(t \in \mathbb{R}^{d_{vocab}}\)</span>, to the <span class="math inline">\(d_{model}\)</span> vector that represents it,</p>
+<div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;">
+<p>“The capital of the country containing Manchester is”</p>
+</div>
+<p>We consider the final token “is” as this is the token from which the model will predict the first unseen token, which we hope will be the correct answer London.</p>
+<p>The first step is to use the Token embedding, <span class="math inline">\(W_{E} \in \mathbb{R}^{d_{model} \times d_{vocab}}\)</span>, which acts as a look-up table from the token “is”, which we represent initially by the token index <span class="math inline">\(t \in \mathbb{R}^{d_{vocab}}\)</span>, to the <span class="math inline">\(d_{model}\)</span> vector that represents it,</p>
 <p><span id="eq-embedding"><span class="math display">\[
 x_{0} = W_{E} t
 \tag{1}\]</span></span></p>
-<p>This is the source of the residual stream, each process in the model adds <em>something</em> to this initial vector <span class="math inline">\(x_{0}\)</span><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. The vector <span class="math inline">\(x_{0}\)</span> starts as an isolated embedding of the token “is” but finishes as a representation capable of predicting the next token in the sequence.</p>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;There has been some progress towards not using the simple additive residual stream. One such example are Hyper-Connections <span class="citation" data-cites="Hyper-Connections">(<a href="#ref-Hyper-Connections" role="doc-biblioref">Zhu et al. 2025</a>)</span>, which allow the strength of connections between layers to be learnt during training. With the residual stream a crucial tool for safety researchers I think it would be a major set back if connection variants such as this became the norm.</p></div></div><div class="quarto-figure quarto-figure-center">
+<p>This is the source of the residual stream, each process in the model adds <em>something</em> to this initial vector <span class="math inline">\(x_{0}\)</span><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. The vector <span class="math inline">\(x_{0}\)</span> starts as an isolated embedding of the token “is” but finishes as a representation capable of predicting the next token in the sequence.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;There has been some progress towards not using the simple additive residual stream. One such example are Hyper-Connections <span class="citation" data-cites="Hyper-Connections">(<a href="#ref-Hyper-Connections" role="doc-biblioref">Zhu et al. 2025</a>)</span>, which allow the strength of connections between layers to be learnt during training.</p></div></div><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/residual-stream.svg" class="img-fluid figure-img" style="width:100.0%"></p>
 <figcaption>High level diagram of the residual stream</figcaption>
 </figure>
 </div>
-<p>Most commonly it seems a <em>layer</em><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> of a transformer refers to the combination of an Attention layer and an MLP layer but they add to the residual stream sequentially,</p>
-<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;<span class="citation" data-cites="Mathematical-Framework-for-Transformer-Circuits">(<a href="#ref-Mathematical-Framework-for-Transformer-Circuits" role="doc-biblioref">Elhage et al. 2021</a>)</span> also refers to this as a “residual block”.</p></div></div><p><span id="eq-layer"><span class="math display">\[
+<p>Most commonly a <em>layer</em><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> of a transformer refers to the combination of an Attention layer and an MLP layer but they add to the residual stream sequentially,</p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;<span class="citation" data-cites="Mathematical-Framework-for-Transformer-Circuits">(<a href="#ref-Mathematical-Framework-for-Transformer-Circuits" role="doc-biblioref">Elhage et al. 2021</a>)</span> also refers to this as a “residual block”.</p></div></div><p><span id="eq-layer"><span class="math display">\[
 x_{n+1} = x_{n} + Attn(x_{n}) + MLP(x_{n} + Attn(x_{n}))
 \tag{2}\]</span></span></p>
 <p>Attention heads move information from the residual streams of other tokens in the sequence. For example in our example if we are going to answer the question,</p>
 <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;">
 <p>“The capital of the country containing Manchester is”</p>
 </div>
-<p>our final representation <span class="math inline">\(x_{-1}\)</span> is going to need to capture the multi-hop reasoning that the <code>country</code> containing <code>Manchester</code> is the United Kingdom and hence the <code>capital</code> is London we need to move information from these other tokens.</p>
-<p>It must also know these geographical facts, research suggests that this is captured <em>somewhere</em> within the MLP layers <span class="citation" data-cites="Fact-Finding">(<a href="#ref-Fact-Finding" role="doc-biblioref">Nanda et al. 2024</a>)</span>.</p>
+<p>our final representation <span class="math inline">\(x_{-1}\)</span> is going to need to capture the multi-hop reasoning that the <code>country</code> containing <code>Manchester</code> is the United Kingdom and hence the <code>capital</code> is London. Clearly to answer this we need to move information from these other tokens.</p>
+<p>The model must also know these geographical facts, research suggests that this is captured <em>somewhere</em> within the MLP layers <span class="citation" data-cites="Fact-Finding">(<a href="#ref-Fact-Finding" role="doc-biblioref">Nanda et al. 2024</a>)</span>.</p>
 </section>
 <section id="why-residuals" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="why-residuals">Why residuals?</h2>
@@ -297,15 +297,15 @@ x_{n+1} = x_{n} + Attn(x_{n}) + MLP(x_{n} + Attn(x_{n}))
 <p><span id="eq-ResNet-formulation"><span class="math display">\[
 x + f(x)
 \tag{3}\]</span></span></p>
-<p>which has since also become known as a skip connection. The layers of the network return a “residual mapping” <span class="math inline">\(f(x)\)</span> which is added to the main input. From their paper the primary motivation was to combat <em>the degradation problem</em>, where deeper networks have higher training and test error. This should be slightly surprising as we might expect a model with 20 layers can be replicated within a model of 50 layers.</p>
+<p>which has since also become known as a skip connection. The layers of the network return a “residual mapping” <span class="math inline">\(f(x)\)</span> which is added to the main input. From their paper the primary motivation was to combat <em>the degradation problem</em>, where deeper networks have higher training and test error. This should be slightly surprising, we might expect a model with 20 layers can be replicated within a model of 50 layers - if we set the first 20 layers to match the smaller model and the remaining 30 layers to be the identity.</p>
 <p>It turns out that for networks without a residual stream the correlation between gradients decays exponentially <span class="citation" data-cites="shattered-gradients">(<a href="#ref-shattered-gradients" role="doc-biblioref">Balduzzi et al. 2018</a>)</span>, that is to say at a point <span class="math inline">\(x\)</span> the gradient <span class="math inline">\(\nabla f(x)\)</span> might be almost random compared to a near by point <span class="math inline">\(x + \delta\)</span> with gradient <span class="math inline">\(\nabla f(x + \delta)\)</span>. If the gradients are almost random gradient descent is too, we set off down the slope only to immediately find it increase again. In contrast, with skip connections the correlation between gradients decays sub-linearly.</p>
-<p>A subtly different additional benefit to using a residual stream is that we also solve <em>the vanishing gradient problem</em>, where by in a deep network backpropagation will involve many applications of the chain rule such that if any of the gradients are small the total update to the weights will vanish.</p>
+<p>A subtly different additional benefit to using a residual stream is that we also address <em>the vanishing gradient problem</em>, which is where backpropagation in a deep network will involve many applications of the chain rule such that if any of the gradients are small the total update to the weights will vanish.</p>
 <p>Following this 3Blue1Brown explainer <span class="citation" data-cites="3b1b-backpropagation">(<a href="#ref-3b1b-backpropagation" role="doc-biblioref">Sanderson 2017</a>)</span> we consider a very simple network with single neuron layers, connected in sequence. Let’s say every layer consists of,</p>
 <p><span id="eq-simple-network"><span class="math display">\[
 f(x_{i}) = \sigma(W x_{i}  + b)
 \tag{4}\]</span></span></p>
-<p>The <em>sigmoid function</em><a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>, <span class="math inline">\(\sigma\)</span>, is defined as,</p>
-<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;ReLU and GELU activation functions are designed to also combat the vanishing gradient problem.</p></div></div><p><span id="eq-sigmoid"><span class="math display">\[
+<p>The <em>sigmoid function</em><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>, <span class="math inline">\(\sigma\)</span>, is defined as,</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;ReLU and GELU activation functions are designed to also address the vanishing gradient problem.</p></div></div><p><span id="eq-sigmoid"><span class="math display">\[
 \sigma(z) = \frac{e^z}{1+e^z}
 \tag{5}\]</span></span></p>
 <p>Its derivative, <span class="math inline">\(\sigma'(z) = \sigma(z)(1 - \sigma(z))\)</span>, is bounded within the interval <span class="math inline">\((0, 0.25]\)</span>. Hence, when we calculate the gradient of the loss, <span class="math inline">\(\nabla \mathcal{L}\)</span>, in backpropagation this term will reduce the resulting value by at least a factor of 4 each layer. As we update the weights according to <span class="math inline">\(-\eta \nabla \mathcal{L}\)</span> when the gradient vanishes we stop learning.</p>
@@ -316,9 +316,9 @@ x_{i+1} = x_{i} + f(x_{i})
 <p><span id="eq-residual-gradient"><span class="math display">\[
 \frac{\partial(x_{i+1})}{\partial x_{i}} = 1 + f'(x_{i})
 \tag{7}\]</span></span></p>
-<p>The constant term <span class="math inline">\(1\)</span> means even with repeated applications of the chain rule it is always possible to trace through the network to get a non-zero update to earlier layers.</p>
+<p>The constant term <span class="math inline">\(1\)</span> means even with repeated applications of the chain rule it is always possible to trace through the network and update the weights of earlier layers.</p>
 </section>
-<section id="the-residual-stream-in-mechanistic-interpretability" class="level2">
+<section id="the-residual-stream-in-mechanistic-interpretability" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-residual-stream-in-mechanistic-interpretability">The Residual Stream in Mechanistic Interpretability</h2>
 <p>With this consistent <span class="math inline">\(d_{model}\)</span> dimension vector flowing through the model we have an obvious place to inspect the model’s <em>thoughts</em>. As each layer refines the representation of the “is” token in preparation for predicting the next we can explore two ways to interpret this process:</p>
 <ul>
@@ -326,20 +326,20 @@ x_{i+1} = x_{i} + f(x_{i})
 <li>Linear Probes <span class="citation" data-cites="Linear-Probes">(<a href="#ref-Linear-Probes" role="doc-biblioref">Alain and Bengio 2018</a>)</span></li>
 </ul>
 <p>In the rest of this post I have some experiments that use these techniques to illustrate their value.</p>
-<section id="logit-lens" class="level3">
+<section id="logit-lens" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="logit-lens">Logit Lens</h3>
 <p>The idea beyhind Logit Lens is simple, after the final layer, <span class="math inline">\(x_{-1}\)</span>, of the transformer we apply an unembedding to get logits,</p>
 <p><span id="eq-unembed"><span class="math display">\[
 T(t) = W_{U} x_{-1}
 \tag{8}\]</span></span></p>
-<p>which allow us to predict words. For our input sequence GPT-2 returned:</p>
+<p>which allow us to predict words. For our input sequence Phi-3 returned:</p>
 <ul>
-<li><code>London</code> with 13% confidence</li>
-<li><code>Birmingham</code> with 8% confidence</li>
-<li><code>not</code> with 6% confidence</li>
+<li><code>London</code> with 76% probability</li>
+<li><code>West</code> with 5% probability</li>
+<li><code>B</code> with 4% probability</li>
 <li>…</li>
 </ul>
-<p>We can however apply the unembedding to intermediate vectors in the residual stream, getting a crude understanding of what the model is thinking of at that point. This allows us, in a very simple way, to see the thoughts of the model progress through the layers.</p>
+<p>We can however apply the unembedding to intermediate vectors in the residual stream, getting a crude understanding of what the model is thinking at that point. This allows us to see the most probably token next token for each token in the sequence and for each layer in the model.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/logit-lens.svg" class="img-fluid figure-img" style="width:100.0%"></p>
@@ -358,13 +358,12 @@ T(t) = W_{U} x_{-1}
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>It turns out that logit lens is not very reliable, when we apply the unembedding we find something uninformative such as the input token repeated.</p>
-<p>This problem is partially solved by the Tuned Lens <span class="citation" data-cites="Tuned-Lens">(<a href="#ref-Tuned-Lens" role="doc-biblioref">Belrose et al. 2023</a>)</span>.</p>
-<p>By accounting for a non-zero bias term and allowing a change of basis we get results that better match how Logit Lens performed on GPT-2.</p>
+<p>It turns out that Logit Lens is not very reliable. Each layer is free to represent features differently so long as the final layer corresponds to the unembedding. It works for some models but not all.</p>
+<p>This problem is partially solved by the Tuned Lens <span class="citation" data-cites="Tuned-Lens">(<a href="#ref-Tuned-Lens" role="doc-biblioref">Belrose et al. 2023</a>)</span>. By accounting for a non-zero bias term and allowing a change of basis we get results that better match how Logit Lens orginally performed on GPT-2.</p>
 </div>
 </div>
 </div>
-<p>A great example of using a Logit Lens is the paper “Do Llamas Work in English? On the Latent Language of Multilingual Transformers” <span class="citation" data-cites="do-llamas-work-in-english">(<a href="#ref-do-llamas-work-in-english" role="doc-biblioref">Wendler et al. 2024</a>)</span>. Which gave models a translation task and applied Logit Lens to see if the model thought in prompt language or English.</p>
+<p>A great example of using a Logit Lens is the paper “Do Llamas Work in English? On the Latent Language of Multilingual Transformers” <span class="citation" data-cites="do-llamas-work-in-english">(<a href="#ref-do-llamas-work-in-english" role="doc-biblioref">Wendler et al. 2024</a>)</span>. Which gave models a translation task and applied Logit Lens to see if the model thought in the prompt language or English.</p>
 <p>I have replicated this experiment using Phi-3 and a simple prompt where we expect the model to spot the pattern in French and return the correct flavour associated with the food,</p>
 <div style="text-align: center; font-style: italic; font-size: 1.2em; margin: 20px 0;">
 <p>“Citron: Acide<br>
@@ -372,37 +371,37 @@ Sucre: Sucré<br>
 Piment: Épicé<br>
 Miel:”</p>
 </div>
-<p>Where we would expect a response <em>Doux</em> telling us that <em>Miel/Honey</em> has a <em>Sweet/Mild</em> flavour.</p>
-<div class="quarto-figure quarto-figure-center">
+<p>For this prompt we would expect a response <em>Doux</em> telling us that <em>Miel</em> (Honey) has a <em>Sweet/Mild</em> flavour. We run inference with the prompt and save the hidden states. Then we apply <span class="math inline">\(W_{U}\)</span> and a softmax<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> and find the token with the highest probability for each layer.</p>
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;The softmax function is <span class="math inline">\(\sigma(z_{i}) = \frac{e^{z_{i}}}{\sum e^{z_{j}}}\)</span></p></div></div><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/logit_lens_viz.svg" class="img-fluid figure-img" style="width:100.0%"></p>
 <figcaption>Evolution of tokens seen with Logit Lens</figcaption>
 </figure>
 </div>
-<p>In the images above we can see a successful replication of <span class="citation" data-cites="do-llamas-work-in-english">(<a href="#ref-do-llamas-work-in-english" role="doc-biblioref">Wendler et al. 2024</a>)</span>, from layer 22 to 27 the model is thinking <code>sweet</code> in English only in the last 4 layers does it pivot and prepare to output the correct French word <code>Doux</code>!</p>
+<p>In the plot above we can see a successful replication of <span class="citation" data-cites="do-llamas-work-in-english">(<a href="#ref-do-llamas-work-in-english" role="doc-biblioref">Wendler et al. 2024</a>)</span>. With rows representing the layers of the model and columns the tokens in the sequence. We see from layer 22 to 27 the model is thinking <code>sweet</code> in English and only in the last 4 layers does it pivot and prepare to output the correct French word <code>Doux</code>!</p>
 </section>
 <section id="linear-probes" class="level3">
 <h3 class="anchored" data-anchor-id="linear-probes">Linear Probes</h3>
-<p>Linear probes approach the interpretability problem in a different way. Imagine we have two classes of inputs, the linear probe is a classifier trained on the residual stream vectors that learns to distinguish the classes. Examples might include:</p>
+<p>Linear probes approach the interpretability problem in a different way. Imagine we have two classes of inputs, the linear probe is a classifier trained on the residual stream vectors that learns to distinguish these classes. Examples might include:</p>
 <ul>
 <li>Proper punctuation vs.&nbsp;ALL CAPS</li>
-<li>Natural language vs.&nbsp;HTML</li>
+<li>Natural language vs.&nbsp;HTML formatting</li>
 <li>Harmless Instructions vs.&nbsp;Harmful Instructions</li>
 </ul>
-<p>The first case we might imagine is quite simple to learn: there is a simple pattern-matching problem for the model to spot between <code>"Hello, can I help you?"</code> and <code>"HELLO, CAN I HELP YOU?"</code>. Likewise, the second is hopefully quite easy to discern, but perhaps requires some more thinking: <code>"The main header of the page says Hello."</code> looks very different to <code>"&lt;h1 class='main-header'&gt; Hello &lt;/h1&gt;"</code>, but it requires more knowledge to consistently separate the two.</p>
-<p>Finally, examples of harmless and harmful text might be really tricky to separate, requiring genuine semantic understanding. For example, <code>"There is a bug in your code, so you should **refactor the function.**"</code> is quite harmless whereas <code>"There is a bug in your code, so you should **disable the firewall.**"</code> could be catastrophic.</p>
+<p>The first case is probably quite easy to learn: there is a simple pattern-matching problem for the model to spot between <code>"Hello, can I help you?"</code> and <code>"HELLO, CAN I HELP YOU?"</code>. Likewise, the second is hopefully quite easy but perhaps requires some more thinking: <code>"The main header of the page says Hello."</code> looks very different to <code>"&lt;h1 class='main-header'&gt; Hello &lt;/h1&gt;"</code>.</p>
+<p>Examples of harmless and harmful text are more tricky to separate, requiring genuine semantic understanding. For example, <code>"There is a bug in your code, so you should **refactor the function.**"</code> is quite harmless whereas <code>"There is a bug in your code, so you should **disable the firewall.**"</code> could be catastrophic.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/linear-probes.svg" class="img-fluid figure-img" style="width:100.0%"></p>
 <figcaption>High level diagram of Linear Probes</figcaption>
 </figure>
 </div>
-<p>I ran three experiments across these example datasets. I used the simplest Linear Probe a logistic regression such that for a concept <span class="math inline">\(c\)</span> the probe <span class="math inline">\(p_{c}\)</span> is defined as,</p>
+<p>I ran three experiments across these example datasets. I used the simplest Linear Probe a logistic regression classifier. For a concept <span class="math inline">\(c\)</span> the probe <span class="math inline">\(p_{c}\)</span> is defined as,</p>
 <p><span id="eq-logistic-regression"><span class="math display">\[
-p_{c}= \sigma(\mathbf{w_{c}}^\top \mathbf{x} + b_{c})
+p_{c}= \sigma(W_{c} x + b_{c})
 \tag{9}\]</span></span></p>
 <p>which in PyTorch can be written as,</p>
-<div id="15b1dcb4" class="cell" data-execution_count="1">
+<div id="39134675" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinearProbe(nn.Module):</span>
@@ -417,7 +416,7 @@ p_{c}= \sigma(\mathbf{w_{c}}^\top \mathbf{x} + b_{c})
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        probs <span class="op">=</span> <span class="va">self</span>.sigmoid(logits)</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> probs</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>For each dataset I took just 50 pairs and trained probes on layer 16, the middle of Phi-3, for 200 epochs. We run inference through Phi-3 and save the hidden states <span class="math inline">\(\mathbf{x}_{16}\)</span> on which we can train a linear probes. Results for all three are on the tabs below:</p>
+<p>For each dataset I took just 50 pairs and trained probes on layer 16, the middle of Phi-3, for 200 epochs. We run inference through Phi-3 and save the hidden states <span class="math inline">\(x_{16}\)</span> on which we can train a linear probes. Results for all three are on the tabs below:</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">ALL CAPS</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">HTML</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Harmful</a></li></ul>
 <div class="tab-content">
@@ -428,7 +427,7 @@ p_{c}= \sigma(\mathbf{w_{c}}^\top \mathbf{x} + b_{c})
 <figcaption>Loss and Accuracy for ALL CAPS Linear Probe</figcaption>
 </figure>
 </div>
-<p>After some initial fluctuations by the 50th epoch the probe is certain when an input was normal text or in ALL CAPS.</p>
+<p>After some initial fluctuations by the 50th epoch the probe is certain when an input had proper punctuation or was in ALL CAPS.</p>
 <p>I generated the ALL CAPS dataset by hand by taking permutations subjects, verbs and things <em>e.g.&nbsp;The cat jumps over the fence</em>.</p>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
@@ -438,7 +437,8 @@ p_{c}= \sigma(\mathbf{w_{c}}^\top \mathbf{x} + b_{c})
 <figcaption>Loss and Accuracy for HTML Linear Probe</figcaption>
 </figure>
 </div>
-<p>Learning to distinguish normal text and HTML is even easier, less than 25 epochs and the probe is certain!</p>
+<p>Learning to distinguish natural language and HTML is even easier, less than 25 epochs and the probe is certain!</p>
+<p>For the natural language I used samples from an Alpaca dataset <span class="citation" data-cites="alpaca">(<a href="#ref-alpaca" role="doc-biblioref">Taori et al. 2023</a>)</span> and for the HTML an Alpaca HTML dataset <span class="citation" data-cites="alpaca_html">(<a href="#ref-alpaca_html" role="doc-biblioref">Bui 2023</a>)</span>.</p>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <div class="quarto-figure quarto-figure-center">
@@ -448,9 +448,11 @@ p_{c}= \sigma(\mathbf{w_{c}}^\top \mathbf{x} + b_{c})
 </figure>
 </div>
 <p>Separating harmless and harmful instructions is, as expected, a little harder. By the 75th epoch however the probe is again certain whether a prompt is harmful or not.</p>
+<p>For the harmless instructions I used samples from the an Alpaca dataset <span class="citation" data-cites="alpaca">(<a href="#ref-alpaca" role="doc-biblioref">Taori et al. 2023</a>)</span> and for the harmful instructions an advbench <span class="citation" data-cites="advbench">(<a href="#ref-advbench" role="doc-biblioref">Zou et al. 2023</a>)</span>.</p>
 </div>
 </div>
 </div>
+<p>Hopefully soon I will write a dedicated piece on Linear Probes, watch this space.</p>
 </section>
 </section>
 <section id="references" class="level2">
@@ -471,6 +473,9 @@ Balduzzi, David, Marcus Frean, Lennox Leary, JP Lewis, Kurt Wan-Duo Ma, and Bria
 <div id="ref-Tuned-Lens" class="csl-entry" role="listitem">
 Belrose, Nora, Igor Ostrovsky, Lev McKinney, Zach Furman, Logan Smith, Danny Halawi, Stella Biderman, and Jacob Steinhardt. 2023. <span>“Eliciting Latent Predictions from Transformers with the Tuned Lens.”</span> <a href="https://doi.org/10.48550/arXiv.2303.08112">https://doi.org/10.48550/arXiv.2303.08112</a>.
 </div>
+<div id="ref-alpaca_html" class="csl-entry" role="listitem">
+Bui, Anh-Tuan. 2023. <span>“Html_alpaca.”</span> <em>Hugging Face Hub</em>. <a href="https://huggingface.co/datasets/ttbui/html_alpaca" class="uri">https://huggingface.co/datasets/ttbui/html_alpaca</a>; Hugging Face.
+</div>
 <div id="ref-Mathematical-Framework-for-Transformer-Circuits" class="csl-entry" role="listitem">
 Elhage, Nelson, Neel Nanda, Catherine Olsson, Tom Henighan, Nicholas Joseph, Ben Mann, Amanda Askell, et al. 2021. <span>“A Mathematical Framework for Transformer Circuits.”</span> <em>Transformer Circuits Thread</em>. <a href="https://transformer-circuits.pub/2021/framework/index.html">https://transformer-circuits.pub/2021/framework/index.html</a>.
 </div>
@@ -486,11 +491,17 @@ nostalgebraist. 2020. <span>“Interpreting GPT: The Logit Lens.”</span> <a hr
 <div id="ref-3b1b-backpropagation" class="csl-entry" role="listitem">
 Sanderson, Grant. 2017. <span>“Backpropagation Calculus | Deep Learning Chapter 4.”</span> <a href="https://www.3blue1brown.com/lessons/backpropagation-calculus" class="uri">https://www.3blue1brown.com/lessons/backpropagation-calculus</a>.
 </div>
+<div id="ref-alpaca" class="csl-entry" role="listitem">
+Taori, Rohan, Ishaan Gulrajani, Tianyi Zhang, Yann Dubois, Xuechen Li, Carlos Guestrin, Percy Liang, and Tatsunori B. Hashimoto. 2023. <span>“Alpaca: A Strong, Replicable Instruction-Following Model.”</span> <em>Hugging Face Hub</em>. <a href="https://huggingface.co/datasets/tatsu-lab/alpaca" class="uri">https://huggingface.co/datasets/tatsu-lab/alpaca</a>; Hugging Face.
+</div>
 <div id="ref-do-llamas-work-in-english" class="csl-entry" role="listitem">
 Wendler, Chris, Veniamin Veselovsky, Giovanni Monea, and Robert West. 2024. <span>“Do Llamas Work in English? On the Latent Language of Multilingual Transformers.”</span> <a href="https://arxiv.org/abs/2402.10588">https://arxiv.org/abs/2402.10588</a>.
 </div>
 <div id="ref-Hyper-Connections" class="csl-entry" role="listitem">
 Zhu, Defa, Hongzhi Huang, Zihao Huang, Yutao Zeng, Yunyao Mao, Banggu Wu, Qiyang Min, and Xun Zhou. 2025. <span>“Hyper-Connections.”</span> <a href="https://arxiv.org/abs/2409.19606">https://arxiv.org/abs/2409.19606</a>.
+</div>
+<div id="ref-advbench" class="csl-entry" role="listitem">
+Zou, Andy, Zifan Wang, J. Zico Kolter, and Matt Fredrikson. 2023. <span>“Universal and Transferable Adversarial Attacks on <span>A</span>ligned <span>L</span>anguage <span>M</span>odels.”</span> <a href="https://huggingface.co/datasets/S3IC/advbench" class="uri">https://huggingface.co/datasets/S3IC/advbench</a>; GitHub/Hugging Face.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
