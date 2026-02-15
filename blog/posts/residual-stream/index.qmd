@@ -36,7 +36,7 @@ predict the first unseen token, which we hope will be the correct answer London.
 The first step is to use the Token embedding,
 $W_{E} \in \mathbb{R}^{d_{model} \times d_{vocab}}$, which acts as a look-up table
 from the token "is", which we represent initially by the token index
-$t \in \mathbb{R}^{d_{vocab}}$, to the $d_{model}$ vector that represents it,
+$t \in \mathbb{R}^{d_{vocab}}$, to the $x_{0} \in \mathbb{R}^{d_{model}}$ vector that represents it,
 
 $$
 x_{0} = W_{E} t
@@ -300,15 +300,15 @@ HTML an Alpaca HTML dataset [@alpaca_html].
 Separating harmless and harmful instructions is, as expected, a little harder. By the
 75th epoch however the probe is again certain whether a prompt is harmful or not.
 
-For the harmless instructions I used samples from the an Alpaca dataset [@alpaca] and for
-the harmful instructions an advbench [@advbench].
+For the harmless instructions I used samples from an Alpaca dataset [@alpaca] and for
+the harmful instructions samples from an advbench dataset [@advbench].
 
 :::
 
 We see across all the final validation accuracy is 100% - the probes are capable of
 monitoring the thoughts of the model.
 
-Hopefully soon I will write a dedicated piece on Linear Probes, watch this space.
+*Hopefully soon I will write a dedicated piece on Linear Probes, watch this space.*
 
 ## References
 

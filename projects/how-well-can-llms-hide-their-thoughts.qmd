@@ -10,7 +10,10 @@ What types of models do we get from Adversarial Obfuscation Training, and are so
 
 Linear probes are a promising way to interpret the working of LLMs. They have importantly been shown to allow fast and affordable monitoring of harmful behaviours and as a result are currently a popular technique among safety researchers.
 
+![High level diagram of Linear Probes](images/linear-probes.svg){width="100%"}
+
 However, recent papers suggest that this might be fragile:
+
 - Obfuscated Activations Bypass LLM Latent-Space Defenses, showed that injecting obfuscating tokens evades the probes.
 - Neural Chameleons, showed that with a suitable loss term during training models can be triggered to evades the probes.
 - RL-OBFUSCATION, showed that the models can learn to evade probes via reinforcement learning.
@@ -21,6 +24,6 @@ What types of models do we get from Adversarial Obfuscation Training, and are so
 
 Some research directions we might take:
 
-- Do we get qualitatively different policies from RL Obfuscation [1] when training on other datasets (eg: Dolus Chat [2])
-- Interpret Obfuscated Activations [4] and neural chameleons [3]
+- Do we get qualitatively different policies from RL Obfuscation when training on other datasets (eg: Dolus Chat)
+- Interpret Obfuscated Activations and neural chameleons
 - Try defences on backdoored models from RL Obfuscation
