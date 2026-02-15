@@ -269,7 +269,7 @@ window.Quarto = {
 <p>“The capital of the country containing Manchester is”</p>
 </div>
 <p>We consider the final token “is” as this is the token from which the model will predict the first unseen token, which we hope will be the correct answer London.</p>
-<p>The first step is to use the Token embedding, <span class="math inline">\(W_{E} \in \mathbb{R}^{d_{model} \times d_{vocab}}\)</span>, which acts as a look-up table from the token “is”, which we represent initially by the token index <span class="math inline">\(t \in \mathbb{R}^{d_{vocab}}\)</span>, to the <span class="math inline">\(d_{model}\)</span> vector that represents it,</p>
+<p>The first step is to use the Token embedding, <span class="math inline">\(W_{E} \in \mathbb{R}^{d_{model} \times d_{vocab}}\)</span>, which acts as a look-up table from the token “is”, which we represent initially by the token index <span class="math inline">\(t \in \mathbb{R}^{d_{vocab}}\)</span>, to the <span class="math inline">\(x_{0} \in \mathbb{R}^{d_{model}}\)</span> vector that represents it,</p>
 <p><span id="eq-embedding"><span class="math display">\[
 x_{0} = W_{E} t
 \tag{1}\]</span></span></p>
@@ -401,7 +401,7 @@ Miel:”</p>
 p_{c}= \sigma(W_{c} x + b_{c})
 \tag{9}\]</span></span></p>
 <p>which in PyTorch can be written as,</p>
-<div id="8e156d7b" class="cell" data-execution_count="1">
+<div id="f3a952f6" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinearProbe(nn.Module):</span>
@@ -448,12 +448,12 @@ p_{c}= \sigma(W_{c} x + b_{c})
 </figure>
 </div>
 <p>Separating harmless and harmful instructions is, as expected, a little harder. By the 75th epoch however the probe is again certain whether a prompt is harmful or not.</p>
-<p>For the harmless instructions I used samples from the an Alpaca dataset <span class="citation" data-cites="alpaca">(<a href="#ref-alpaca" role="doc-biblioref">Taori et al. 2023</a>)</span> and for the harmful instructions an advbench <span class="citation" data-cites="advbench">(<a href="#ref-advbench" role="doc-biblioref">Zou et al. 2023</a>)</span>.</p>
+<p>For the harmless instructions I used samples from an Alpaca dataset <span class="citation" data-cites="alpaca">(<a href="#ref-alpaca" role="doc-biblioref">Taori et al. 2023</a>)</span> and for the harmful instructions samples from an advbench dataset <span class="citation" data-cites="advbench">(<a href="#ref-advbench" role="doc-biblioref">Zou et al. 2023</a>)</span>.</p>
 </div>
 </div>
 </div>
 <p>We see across all the final validation accuracy is 100% - the probes are capable of monitoring the thoughts of the model.</p>
-<p>Hopefully soon I will write a dedicated piece on Linear Probes, watch this space.</p>
+<p><em>Hopefully soon I will write a dedicated piece on Linear Probes, watch this space.</em></p>
 </section>
 </section>
 <section id="references" class="level2">

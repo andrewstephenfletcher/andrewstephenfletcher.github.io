@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Linear probes are a promising way to interpret the working of LLMs. They have importantly been shown to allow fast and affordable monitoring of harmful behaviours and as a result are currently a popular technique among safety researchers. We want to build on this work and answer: What types of models do we get from Adversarial Obfuscation Training, and are some defences better for dealing with this?">
 
-<title>Blog</title>
+<title>How well can LLMs hide their thoughts from Probes?</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +31,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -70,65 +69,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -150,7 +91,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../blog/index.html" aria-current="page"> 
+    <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
@@ -179,16 +120,21 @@ window.Quarto = {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bGluZWFyJTIwcHJvYmVz">linear probes <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bWVjaGFuaXN0aWMlMjBpbnRlcnByZXRhYmlsaXR5">mechanistic interpretability <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cmVzaWR1YWwlMjBzdHJlYW0=">residual stream <span class="quarto-category-count">(1)</span></div></div></div>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Blog</h1>
+<h1 class="title">How well can LLMs hide their thoughts from Probes?</h1>
 </div>
 
+<div>
+  <div class="description">
+    Linear probes are a promising way to interpret the working of LLMs. They have importantly been shown to allow fast and affordable monitoring of harmful behaviours and as a result are currently a popular technique among safety researchers. We want to build on this work and answer: What types of models do we get from Adversarial Obfuscation Training, and are some defences better for dealing with this?
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -203,47 +149,31 @@ window.Quarto = {
 </header>
 
 
-<p>Documenting my learning of AI Safety.</p>
-
-
-
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="bWVjaGFuaXN0aWMlMjBpbnRlcnByZXRhYmlsaXR5JTJDcmVzaWR1YWwlMjBzdHJlYW0lMkNsaW5lYXIlMjBwcm9iZXM=" data-listing-date-sort="1770681600000" data-listing-file-modified-sort="1771156325192" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1709">
-<div class="thumbnail"><a href="../blog/posts/residual-stream/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/residual-stream/images/residual-stream.svg"  class="thumbnail-image card-img"/></p>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../blog/posts/residual-stream/index.html" class="no-external">The Residual Stream</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bWVjaGFuaXN0aWMlMjBpbnRlcnByZXRhYmlsaXR5'); return false;">mechanistic interpretability</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('cmVzaWR1YWwlMjBzdHJlYW0='); return false;">residual stream</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('bGluZWFyJTIwcHJvYmVz'); return false;">linear probes</div>
-
+<p>Linear probes are a promising way to interpret the working of LLMs. They have importantly been shown to allow fast and affordable monitoring of harmful behaviours and as a result are currently a popular technique among safety researchers.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/linear-probes.svg" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption>High level diagram of Linear Probes</figcaption>
+</figure>
 </div>
-<div class="delink listing-description"><a href="../blog/posts/residual-stream/index.html" class="no-external">
-This post discusses the residual stream in transformer models and builds towards using it for two examples of mechanistic interpretability: Logit Lens <span class="citation" data-cites="Logit-Lens">(nostalgebraist 2020)</span> a…<span class="citation" data-cites="Linear-Probes"></span>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../blog/posts/residual-stream/index.html" class="no-external">
-<div class="listing-date">
-Feb 10, 2026
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+<p>However, recent papers suggest that this might be fragile:</p>
+<ul>
+<li>Obfuscated Activations Bypass LLM Latent-Space Defenses, showed that injecting obfuscating tokens evades the probes.</li>
+<li>Neural Chameleons, showed that with a suitable loss term during training models can be triggered to evades the probes.</li>
+<li>RL-OBFUSCATION, showed that the models can learn to evade probes via reinforcement learning.</li>
+</ul>
+<p>We want to build on this work and answer:</p>
+<p>What types of models do we get from Adversarial Obfuscation Training, and are some defences better for dealing with this?</p>
+<p>Some research directions we might take:</p>
+<ul>
+<li>Do we get qualitatively different policies from RL Obfuscation when training on other datasets (eg: Dolus Chat)</li>
+<li>Interpret Obfuscated Activations and neural chameleons</li>
+<li>Try defences on backdoored models from RL Obfuscation</li>
+</ul>
+
+
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
